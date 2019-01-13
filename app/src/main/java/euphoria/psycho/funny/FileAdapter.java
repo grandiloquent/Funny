@@ -11,6 +11,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,15 +26,15 @@ import euphoria.psycho.funny.util.lifecycle.Lifecycle;
 
 public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> implements LifecycleObserver {
 
+    private final ArrayMap<FileItem.FileType, Drawable> mCache = new ArrayMap<>();
     private final Context mContext;
     private List<FileItem> mFileItems;
-    private final ArrayMap<FileItem.FileType, Drawable> mCache = new ArrayMap<>();
-    ;
+    private final ImageLoader mImageLoader;
 
     public FileAdapter(Context context, Lifecycle lifecycle) {
         mContext = context;
         Resources resources = context.getResources();
-
+        mImageLoader = new ImageLoader();
         mCache.put(FileItem.FileType.DIRECTORY, resources.getDrawable(R.drawable.ic_folder_yellow));
         mCache.put(FileItem.FileType.TEXT, resources.getDrawable(R.drawable.ic_file_txt));
         mCache.put(FileItem.FileType.AUDIO, resources.getDrawable(R.drawable.ic_file_audio));
@@ -62,7 +66,12 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> im
         FileItem fileItem = mFileItems.get(position);
         holder.title.setText(fileItem.getName());
         holder.description.setText(fileItem.getDescription());
-        holder.musicCover.setImageDrawable(mCache.get(fileItem.getType()));
+        Drawable drawable = mCache.get(fileItem.getType());
+        if (drawable == null) {
+            mImageLoader.load(fileItem, holder.musicCover);
+        } else {
+            holder.musicCover.setImageDrawable(drawable);
+        }
     }
 
     @NonNull
@@ -74,10 +83,10 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> im
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView musicCover;
-        TextView title;
         TextView description;
         ImageView more;
+        ImageView musicCover;
+        TextView title;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

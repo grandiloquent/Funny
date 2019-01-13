@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+
 import java.io.File;
 import java.io.FileFilter;
 import java.text.Collator;
@@ -74,26 +75,18 @@ public class FileFragment extends ObservableFragment {
         refreshRecyclerView();
     }
 
-    private List<FileItem> getFileItems(File directory) {
-        File[] files = directory.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File path) {
-                if (path.isDirectory()) return true;
 
-                if (path.isFile())
-                    return true;
-                return true;
-            }
-        });
+    private List<FileItem> getFileItems(File directory) {
+        File[] files = directory.listFiles();
         if (files == null || files.length == 0) return null;
 
         List<FileItem> fileItems = new ArrayList<>();
 
         for (File f : files) {
+
+            boolean skip = false;
             FileItem fileItem = new FileItem();
-            fileItem.setName(f.getName());
-            fileItem.setPath(f.getAbsolutePath());
-            fileItem.setLastModified(f.lastModified());
+
 
             if (f.isDirectory()) {
                 fileItem.setType(FileItem.FileType.DIRECTORY);
@@ -104,15 +97,19 @@ public class FileFragment extends ObservableFragment {
                     fileItem.setType(FileItem.FileType.VIDEO);
                 } else if (Simple.isAudio(f)) {
                     fileItem.setType(FileItem.FileType.AUDIO);
-                } else if (Simple.isText(f)) {
+                } else if (Simple.isSubTitle(f)) {
                     fileItem.setType(FileItem.FileType.TEXT);
                 } else {
-                    fileItem.setType(FileItem.FileType.OTHER);
+                    skip = true;
                 }
                 fileItem.setSize(f.length());
                 fileItem.setDescription(Simple.formatSize(fileItem.getSize()));
             }
-            fileItems.add(fileItem);
+            fileItem.setName(f.getName());
+            fileItem.setPath(f.getAbsolutePath());
+            fileItem.setLastModified(f.lastModified());
+            if (!skip)
+                fileItems.add(fileItem);
         }
         Collator collator = Collator.getInstance(Locale.CHINA);
         Comparator<FileItem> comparator = (o1, o2) -> {
@@ -123,6 +120,11 @@ public class FileFragment extends ObservableFragment {
                 switch (mSort) {
                     case NAME:
                         return mSortAscending ? collator.compare(o1.getName(), o2.getName()) : collator.compare(o1.getName(), o2.getName()) * -1;
+                    case SIZE:
+                        return o1.getSize() <= o2.getSize() ? (mSortAscending ? 1 : -1) : (mSortAscending ? -1 : 1);
+                    case LAST_MODIFED:
+                        return o1.getLastModified() <= o2.getLastModified() ? (mSortAscending ? 1 : -1) : (mSortAscending ? -1 : 1);
+
 
                 }
 

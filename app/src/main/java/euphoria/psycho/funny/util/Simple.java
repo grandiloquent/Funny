@@ -9,6 +9,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -44,7 +45,7 @@ public class Simple {
             ".ogg"
     };
     private static float sPixelDensity = -1f;
-    private static final String[] sTextExtensions = new String[]{
+    private static final String[] sSubTitleExtensions = new String[]{
             ".srt",
             ".txt",
             ".htm"
@@ -67,6 +68,14 @@ public class Simple {
             throw new NullPointerException(message);
         }
         return value;
+    }
+
+    public static void closeSilently(Closeable c) {
+        if (c == null) return;
+        try {
+            c.close();
+        } catch (IOException t) {
+        }
     }
 
     public static boolean deleteDirectoryRecursively(File directory) {
@@ -204,16 +213,18 @@ public class Simple {
         return true;
     }
 
+    public static boolean isSubTitle(File file) {
+        String ext = getExtension(file.getName());
+        if (ext == null) return false;
+        return linearSearch(sSubTitleExtensions, ext) != -1;
+    }
+
     public static boolean isVideo(File file) {
         String ext = getExtension(file.getName());
         if (ext == null) return false;
         return linearSearch(sVideoExtensions, ext) != -1;
     }
-    public static boolean isText(File file) {
-        String ext = getExtension(file.getName());
-        if (ext == null) return false;
-        return linearSearch(sTextExtensions, ext) != -1;
-    }
+
     public static <T> String joining(List<T> list, String separator) {
         StringBuilder builder = new StringBuilder();
         for (T t : list) {
