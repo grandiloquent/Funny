@@ -27,6 +27,8 @@ import androidx.annotation.WorkerThread;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import euphoria.psycho.funny.ui.SwipeLayout;
 import euphoria.psycho.funny.util.AndroidServices;
 import euphoria.psycho.funny.util.ComparatorUtils;
 import euphoria.psycho.funny.util.Simple;
@@ -50,6 +52,7 @@ public class FileFragment extends ObservableFragment {
     private RecyclerView mRecyclerView;
     private FileItem.FileSort mSort;
     private boolean mSortAscending;
+    private SwipeLayout mSwipeLayout;
 
     private void actionAscending() {
 
@@ -172,6 +175,7 @@ public class FileFragment extends ObservableFragment {
         List<FileItem> items = getFileItems(mDirectory);
         ThreadUtils.postOnMainThread(() -> {
             mFileAdapter.setFileItems(items);
+            mSwipeLayout.setRefreshing(false);
         });
     }
 
@@ -212,6 +216,13 @@ public class FileFragment extends ObservableFragment {
             return null;
         }
         View view = inflater.inflate(R.layout.fragment_file, container, false);
+        mSwipeLayout = view.findViewById(R.id.swipe);
+        mSwipeLayout.setRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                ThreadUtils.postOnBackgroundThread(FileFragment.this::refreshRecyclerView);
+            }
+        });
         mRecyclerView = view.findViewById(R.id.recycler);
         mLayoutManager = new LinearLayoutManager(getContext());
         mLayoutManager.setOrientation(RecyclerView.VERTICAL);

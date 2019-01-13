@@ -1,4 +1,5 @@
 package euphoria.psycho.funny.util;
+
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -7,19 +8,23 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Build;
 import android.util.Log;
+
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import euphoria.psycho.common.Shared;
+import static euphoria.psycho.funny.util.Simple.assertTrue;
+import static euphoria.psycho.funny.util.Simple.prevPowerOf2;
 
-import static euphoria.psycho.common.CheckUtils.assertTrue;
+
 public class BitmapUtils {
     private static final String TAG = "BitmapUtils";
     private static final int DEFAULT_JPEG_QUALITY = 90;
     public static final int UNCONSTRAINED = -1;
+
     private BitmapUtils() {
     }
+
     /*
      * Compute the sample size as a function of minSideLength
      * and maxNumOfPixels.
@@ -44,9 +49,10 @@ public class BitmapUtils {
         int initialSize = computeInitialSampleSize(
                 width, height, minSideLength, maxNumOfPixels);
         return initialSize <= 8
-                ? Shared.nextPowerOf2(initialSize)
+                ? Simple.nextPowerOf2(initialSize)
                 : (initialSize + 7) / 8 * 8;
     }
+
     private static int computeInitialSampleSize(int w, int h,
                                                 int minSideLength, int maxNumOfPixels) {
         if (maxNumOfPixels == UNCONSTRAINED
@@ -60,6 +66,7 @@ public class BitmapUtils {
             return Math.max(sampleSize, lowerBound);
         }
     }
+
     // This computes a sample size which makes the longer side at least
     // minSideLength long. If that's not possible, return 1.
     public static int computeSampleSizeLarger(int w, int h,
@@ -67,25 +74,28 @@ public class BitmapUtils {
         int initialSize = Math.max(w / minSideLength, h / minSideLength);
         if (initialSize <= 1) return 1;
         return initialSize <= 8
-                ? Shared.prevPowerOf2(initialSize)
+                ? prevPowerOf2(initialSize)
                 : initialSize / 8 * 8;
     }
+
     // Find the min x that 1 / x >= scale
     public static int computeSampleSizeLarger(float scale) {
         int initialSize = (int) Math.floor(1d / scale);
         if (initialSize <= 1) return 1;
         return initialSize <= 8
-                ? Shared.prevPowerOf2(initialSize)
+                ? prevPowerOf2(initialSize)
                 : initialSize / 8 * 8;
     }
+
     // Find the max x that 1 / x <= scale.
     public static int computeSampleSize(float scale) {
         assertTrue(scale > 0);
         int initialSize = Math.max(1, (int) Math.ceil(1 / scale));
         return initialSize <= 8
-                ? Shared.nextPowerOf2(initialSize)
+                ? Simple.nextPowerOf2(initialSize)
                 : (initialSize + 7) / 8 * 8;
     }
+
     public static Bitmap resizeBitmapByScale(
             Bitmap bitmap, float scale, boolean recycle) {
         int width = Math.round(bitmap.getWidth() * scale);
@@ -100,6 +110,7 @@ public class BitmapUtils {
         if (recycle) bitmap.recycle();
         return target;
     }
+
     private static Bitmap.Config getConfig(Bitmap bitmap) {
         Bitmap.Config config = bitmap.getConfig();
         if (config == null) {
@@ -107,6 +118,7 @@ public class BitmapUtils {
         }
         return config;
     }
+
     public static Bitmap resizeDownBySideLength(
             Bitmap bitmap, int maxLength, boolean recycle) {
         int srcWidth = bitmap.getWidth();
@@ -116,6 +128,7 @@ public class BitmapUtils {
         if (scale >= 1.0f) return bitmap;
         return resizeBitmapByScale(bitmap, scale, recycle);
     }
+
     public static Bitmap resizeAndCropCenter(Bitmap bitmap, int size, boolean recycle) {
         int w = bitmap.getWidth();
         int h = bitmap.getHeight();
@@ -134,6 +147,7 @@ public class BitmapUtils {
         if (recycle) bitmap.recycle();
         return target;
     }
+
     public static void recycleSilently(Bitmap bitmap) {
         if (bitmap == null) return;
         try {
@@ -142,6 +156,7 @@ public class BitmapUtils {
             Log.w(TAG, "unable recycle bitmap", t);
         }
     }
+
     public static Bitmap rotateBitmap(Bitmap source, int rotation, boolean recycle) {
         if (rotation == 0) return source;
         int w = source.getWidth();
@@ -152,6 +167,7 @@ public class BitmapUtils {
         if (recycle) source.recycle();
         return bitmap;
     }
+
     public static Bitmap createVideoThumbnail(String filePath) {
         // MediaMetadataRetriever is available on API Level 8
         // but is hidden until API Level 10
@@ -197,20 +213,24 @@ public class BitmapUtils {
         }
         return null;
     }
+
     public static byte[] compressToBytes(Bitmap bitmap) {
         return compressToBytes(bitmap, DEFAULT_JPEG_QUALITY);
     }
+
     public static byte[] compressToBytes(Bitmap bitmap, int quality) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(65536);
         bitmap.compress(CompressFormat.JPEG, quality, baos);
         return baos.toByteArray();
     }
+
     public static boolean isSupportedByRegionDecoder(String mimeType) {
         if (mimeType == null) return false;
         mimeType = mimeType.toLowerCase();
         return mimeType.startsWith("image/") &&
                 (!mimeType.equals("image/gif") && !mimeType.endsWith("bmp"));
     }
+
     public static boolean isRotationSupported(String mimeType) {
         if (mimeType == null) return false;
         mimeType = mimeType.toLowerCase();

@@ -77,7 +77,11 @@ public class Simple {
         } catch (IOException t) {
         }
     }
-
+    public static void assertTrue(boolean cond) {
+        if (!cond) {
+            throw new AssertionError();
+        }
+    }
     public static boolean deleteDirectoryRecursively(File directory) {
         if (!directory.exists() || !directory.isDirectory()) {
             return false;
