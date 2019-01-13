@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="55dp"
+    android:background="?android:attr/selectableItemBackground">
+    <!--android:tint="@color/media_item_icon_not_playing"-->
+    <!--android:tintMode="src_in"-->
+    <ImageView
+        android:id="@+id/music_cover"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="10dp"
+        android:scaleType="centerCrop"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/guide_line"
+        app:layout_constraintEnd_toStartOf="@+id/more"
+        app:layout_constraintStart_toEndOf="@+id/music_cover"
+        tools:text="The Best Music EVAH1111 FOREVER YOUNG I'M AWESOME!!!11^H^H" />
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLength="20"
+        android:maxLines="1"
+        android:text="TextView"
+        android:textColor="#FF757575"
+        android:textSize="11sp"
+
+        app:layout_constraintEnd_toStartOf="@+id/more"
+        app:layout_constraintStart_toEndOf="@+id/music_cover"
+        app:layout_constraintTop_toTopOf="@+id/guide_line" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guide_line"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".5" />
+
+    <ImageView
+        android:id="@+id/more"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="?android:attr/selectableItemBackground"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_context_more"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
