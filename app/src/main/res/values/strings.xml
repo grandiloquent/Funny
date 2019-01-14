@@ -3,4 +3,7 @@
     <string name="drawer_open">打开</string>
     <string name="drawer_close">打开</string>
 
+    <string name="message_subtitle_not_found">未搜索到相关字幕</string>
+    <string name="menu_storage">Storage</string>
+    <string name="menu_sdcard">SDCard</string>
 </resources>

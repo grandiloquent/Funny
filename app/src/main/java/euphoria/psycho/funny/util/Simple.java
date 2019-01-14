@@ -2,28 +2,19 @@ package euphoria.psycho.funny.util;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.os.Environment;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+
+import androidx.fragment.app.Fragment;
 
 
 public class Simple {
@@ -37,40 +28,11 @@ public class Simple {
         }
     }
 
-    public static boolean checkExternalStorage() {
-        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
-
-    }
-
     public static <T> T checkNotNull(T value, String message) {
         if (value == null) {
             throw new NullPointerException(message);
         }
         return value;
-    }
-
-    public static void closeSilently(Closeable c) {
-        if (c == null) return;
-        try {
-            c.close();
-        } catch (IOException t) {
-        }
-    }
-
-    public static boolean deleteDirectoryRecursively(File directory) {
-        if (!directory.exists() || !directory.isDirectory()) {
-            return false;
-        }
-
-        for (File entry : directory.listFiles()) {
-            if (entry.isDirectory()) {
-                deleteDirectoryRecursively(entry);
-            }
-            if (!entry.delete()) {
-                return false;
-            }
-        }
-        return directory.delete();
     }
 
     public static float dpToPixel(float dp) {
@@ -79,69 +41,6 @@ public class Simple {
 
     public static int dpToPixel(int dp) {
         return Math.round(dpToPixel((float) dp));
-    }
-
-    public static String formatSize(long number) {
-        float result = number;
-        String suffix = "";
-        if (result > 900) {
-            suffix = " KB";
-            result = result / 1024;
-        }
-        if (result > 900) {
-            suffix = " MB";
-            result = result / 1024;
-        }
-        if (result > 900) {
-            suffix = " GB";
-            result = result / 1024;
-        }
-        if (result > 900) {
-            suffix = " TB";
-            result = result / 1024;
-        }
-        if (result > 900) {
-            suffix = " PB";
-            result = result / 1024;
-        }
-        String value;
-        if (result < 1) {
-            value = String.format("%.2f", result);
-        } else if (result < 10) {
-            value = String.format("%.1f", result);
-        } else if (result < 100) {
-            value = String.format("%.0f", result);
-        } else {
-            value = String.format("%.0f", result);
-        }
-        return value + suffix;
-    }
-
-    public static int getDirectoryChildCount(File dir) {
-        File[] files = dir.listFiles();
-        if (files == null) return 0;
-        else return files.length;
-    }
-
-    public static String getExtension(String fileName) {
-        if (fileName == null) return null;
-        int length = fileName.length();
-        for (int i = length; --i >= 0; ) {
-            char ch = fileName.charAt(i);
-            if (ch == '.') {
-                if (i != length - 1)
-                    return fileName.substring(i);
-                else
-                    return null;
-            }
-            if (ch == File.separatorChar)
-                break;
-        }
-        return null;
-    }
-
-    public static String getExternalStorageDirectoryPath() {
-        return Environment.getExternalStorageDirectory().getPath();
     }
 
     public static String getSelectedText(EditText editText) {
@@ -224,7 +123,7 @@ public class Simple {
         } else {
             files = dir.listFiles(file -> {
                 if (file.isFile()) {
-                    String extension = getExtension(file.getName());
+                    String extension = FileUtils.getExtension(file.getName());
                     for (String e : extensions) {
                         if (e.equals(extension)) return true;
                     }
@@ -299,48 +198,6 @@ public class Simple {
         return Integer.highestOneBit(n);
     }
 
-    public static byte[] readAllBytes(File file) throws IOException {
-        int length = (int) file.length();
-        byte[] data = new byte[length];
-        FileInputStream stream = new FileInputStream(file);
-        try {
-            int offset = 0;
-            while (offset < length) {
-                offset += stream.read(data, offset, length - offset);
-            }
-        } catch (IOException e) {
-            throw e;
-        } finally {
-            stream.close();
-        }
-        return data;
-    }
-
-    public static List<String> readAllLines(String path, String charset) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), Charset.forName(charset)));
-
-        List<String> arrayList = new ArrayList<>();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            arrayList.add(line);
-        }
-        reader.close();
-        return arrayList;
-    }
-
-    public static String readAllText(Reader reader) throws IOException {
-        char[] buffer = new char[8192];//8k
-        StringBuilder builder = new StringBuilder();
-        while (true) {
-            int read = reader.read(buffer);
-            if (read == -1) {
-                break;
-            }
-            builder.append(buffer, 0, read);
-        }
-        return builder.toString();
-    }
-
     public static void replaceSelectedText(EditText editText, String str) {
         CharSequence c = editText.getText();
         if (isNullOrWhiteSpace(c)) return;
@@ -399,26 +256,16 @@ public class Simple {
         return value.substring(0, index);
     }
 
-    public static void writeAllLines(String path, String charset, List<String> lines) throws IOException {
+    public static void toast(Fragment fragment, String message, boolean showLong) {
+        if (showLong) {
+            Toast.makeText(fragment.getContext(), message, Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(fragment.getContext(), message, Toast.LENGTH_SHORT).show();
 
-        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(path), Charset.forName(charset));
-
-        for (String line : lines) {
-            writer.write(line);
-            writer.write('\n');
         }
-        writer.close();
     }
 
-    public static void writeAllText(String path, String charset, String text) throws IOException {
-        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(path), Charset.forName(charset));
-        writer.write(text);
-        writer.close();
-    }
-
-    public static void writeAllText(File file, String charset, String text) throws IOException {
-        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), Charset.forName(charset));
-        writer.write(text);
-        writer.close();
+    public static void toast(Fragment fragment, int resId, boolean showLong) {
+        toast(fragment, fragment.getResources().getString(resId), showLong);
     }
 }

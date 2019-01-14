@@ -15,7 +15,7 @@ import euphoria.psycho.funny.util.LruCache;
 import euphoria.psycho.funny.util.Simple;
 import euphoria.psycho.funny.util.task.ThreadPool;
 
-import static euphoria.psycho.funny.util.Simple.closeSilently;
+import static euphoria.psycho.funny.util.FileUtils.closeSilently;
 
 
 public class ImageLoader {

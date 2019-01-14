@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_rename"
+        android:title="重命名" />
+    <item
+        android:id="@+id/action_delete"
+        android:title="删除" />
+
+    <item
+        android:id="@+id/action_copy_name"
+        android:title="复制文件名" />
+
+    <item
+        android:id="@+id/action_search_subtitle"
+        android:title="搜索字幕"
+        android:visible="false" />
+    <item
+        android:id="@+id/action_property"
+        android:title="属性" />
+    <item
+        android:id="@+id/action_convert_to_utf8"
+        android:title="UTF8"
+        android:visible="false" />
+</menu>

@@ -76,7 +76,8 @@ public class MainActivity extends BaseAppCompatActivity {
     protected String[] getNeedPermissions() {
         return new String[]{
                 Manifest.permission.CAMERA,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.INTERNET
         };
     }
 
@@ -98,7 +99,10 @@ public class MainActivity extends BaseAppCompatActivity {
     @Override
     public void initialize() {
         super.initialize();
-
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.content, new FileFragment())
+                .commit();
     }
 
     @Override

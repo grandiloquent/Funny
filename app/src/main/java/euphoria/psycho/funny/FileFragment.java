@@ -1,22 +1,38 @@
 package euphoria.psycho.funny;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
+import android.widget.Toast;
 
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,7 +49,7 @@ import euphoria.psycho.funny.util.lifecycle.ObservableFragment;
 
 // https://developer.android.com/guide/components/fragments
 // https://developer.android.com/reference/android/app/Fragment
-public class FileFragment extends ObservableFragment {
+public class FileFragment extends ObservableFragment implements FileAdapter.Callback {
     private static final String KEY_DIRECTORY = "directory";
     private static final String KEY_SORT_BY = "sort_by";
     private static final String KEY_SORT_DIRECTION = "sort_direction";
@@ -54,8 +70,53 @@ public class FileFragment extends ObservableFragment {
         sortByDirection(true);
     }
 
+    private void actionConvertToUtf8(FileItem item) {
+
+    }
+
+    private void actionCopyName(FileItem item) {
+
+    }
+
+    private void actionDelete(FileItem item) {
+
+    }
+
     private void actionDescending() {
         sortByDirection(false);
+    }
+
+    private void actionProperty(FileItem item) {
+
+    }
+
+    private void actionRename(FileItem item) {
+
+    }
+
+    private void actionSdcard() {
+        mDirectory = new File(Environment.getExternalStorageDirectory(), "Videos");
+        refreshRecyclerView();
+    }
+
+    private void actionSearchSubtitle(FileItem item) {
+
+        String movieName = FileUtils.getFileNameWithoutExtension(item.getName());
+        ThreadUtils.postOnBackgroundThread(() -> {
+            try {
+                String json = fetchSubtitleJson(movieName);
+                if (json.length() == 0) throw new IllegalStateException("JSON is empty.");
+                String link = parseSubtitleJson(json);
+                ThreadUtils.postOnMainThread(() -> {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+                    startActivity(browserIntent);
+                });
+            } catch (Exception e) {
+                ThreadUtils.postOnMainThread(() -> {
+                    Simple.toast(this, R.string.message_subtitle_not_found, true);
+                });
+            }
+        });
     }
 
     private void actionSortByLastModified() {
@@ -73,6 +134,31 @@ public class FileFragment extends ObservableFragment {
         refreshRecyclerView();
     }
 
+    private void actionStorage() {
+        mDirectory = new File(FileUtils.getRemovableStoragePath(), "Videos");
+        refreshRecyclerView();
+
+    }
+
+    @WorkerThread
+    private String fetchSubtitleJson(String movieName) throws IOException {
+
+        String query = URLEncoder.encode(movieName, "UTF-8");
+        URL url = new URL("https://rest.opensubtitles.org/search/query-" + query);
+        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+        connection.addRequestProperty("User-Agent", "TemporaryUserAgent");
+        int status = connection.getResponseCode();
+        if (status != 200) throw new IllegalStateException("请求字幕JSON失败。Status Code = " + status);
+        BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf8"));
+        StringBuilder sb = new StringBuilder();
+        String line = "";
+
+        while ((line = br.readLine()) != null) {
+            sb.append(line);
+        }
+
+        return sb.toString();
+    }
 
     private List<FileItem> getFileItems(File directory) {
         File[] files = directory.listFiles();
@@ -101,7 +187,7 @@ public class FileFragment extends ObservableFragment {
                     skip = true;
                 }
                 fileItem.setSize(f.length());
-                fileItem.setDescription(Simple.formatSize(fileItem.getSize()));
+                fileItem.setDescription(FileUtils.formatSize(fileItem.getSize()));
             }
             fileItem.setName(f.getName());
             fileItem.setPath(f.getAbsolutePath());
@@ -165,6 +251,15 @@ public class FileFragment extends ObservableFragment {
         return fileItems;
     }
 
+    private String parseSubtitleJson(String json) throws JSONException {
+
+        JSONArray jsonArray = new JSONArray(json);
+        if (jsonArray.length() > 0) {
+            return jsonArray.getJSONObject(0).getString("SubtitlesLink");
+        }
+        return null;
+    }
+
     @WorkerThread
     private void refreshRecyclerView() {
         List<FileItem> items = getFileItems(mDirectory);
@@ -185,7 +280,7 @@ public class FileFragment extends ObservableFragment {
         super.onCreate(savedInstanceState);
         mPreferences = AndroidServices.instance().providePreferences();
 
-        String dir = mPreferences.getString(KEY_DIRECTORY, Simple.getExternalStorageDirectoryPath());
+        String dir = mPreferences.getString(KEY_DIRECTORY, FileUtils.getExternalStorageDirectoryPath());
 
         mDirectory = new File(dir);
         int sortBy = mPreferences.getInt(KEY_DIRECTORY, FileItem.FileSort.NAME.getValue());
@@ -210,6 +305,10 @@ public class FileFragment extends ObservableFragment {
         if (container == null) {
             return null;
         }
+        Context context = getContext();
+        if (context == null) {
+            return null;
+        }
         View view = inflater.inflate(R.layout.fragment_file, container, false);
         mSwipeLayout = view.findViewById(R.id.swipe);
         mSwipeLayout.setRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -219,7 +318,7 @@ public class FileFragment extends ObservableFragment {
             }
         });
         mRecyclerView = view.findViewById(R.id.recycler);
-        mLayoutManager = new LinearLayoutManager(getContext());
+        mLayoutManager = new LinearLayoutManager(context);
         mLayoutManager.setOrientation(RecyclerView.VERTICAL);
         if (savedInstanceState != null) {
             int scrollPosition = savedInstanceState.getInt(STATE_SCROLL_POSITION);
@@ -228,10 +327,80 @@ public class FileFragment extends ObservableFragment {
         // if dont set Layout Manager the notifydatachanged will not fire
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
-        mFileAdapter = new FileAdapter(getContext(), getLifecycle());
+        mFileAdapter = new FileAdapter(context, this, getLifecycle());
         mRecyclerView.setAdapter(mFileAdapter);
         ThreadUtils.postOnBackgroundThread(this::refreshRecyclerView);
         return view;
+    }
+
+    @Override
+    public void onItemCheckedChanged(FileItem fileItem, boolean selected) {
+
+    }
+
+    @Override
+    public void onItemClicked(int position, FileItem fileItem) {
+
+    }
+
+    @Override
+    public boolean onItemLongClicked(int position, FileItem fileItem) {
+        return false;
+    }
+
+    @Override
+    public void onMenuClicked(View view, final FileItem item) {
+        PopupMenu popupMenu = new PopupMenu(getContext(), view);
+        popupMenu.inflate(R.menu.context_file);
+        FileItem.FileType fileType = item.getType();
+        switch (fileType) {
+            case TEXT:
+                popupMenu.getMenu().findItem(R.id.action_convert_to_utf8).setVisible(true);
+                break;
+            case VIDEO:
+                popupMenu.getMenu().findItem(R.id.action_search_subtitle).setVisible(true);
+                break;
+        }
+        popupMenu.setOnMenuItemClickListener(menuItem -> {
+
+
+            switch (menuItem.getItemId()) {
+                case R.id.action_rename: {
+                    actionRename(item);
+                    return true;
+                }
+
+                case R.id.action_delete: {
+                    actionDelete(item);
+                    return true;
+                }
+
+                case R.id.action_copy_name: {
+                    actionCopyName(item);
+                    return true;
+                }
+
+                case R.id.action_search_subtitle: {
+                    actionSearchSubtitle(item);
+                    return true;
+                }
+
+                case R.id.action_property: {
+                    actionProperty(item);
+                    return true;
+                }
+
+                case R.id.action_convert_to_utf8: {
+                    actionConvertToUtf8(item);
+                    return true;
+                }
+
+            }
+            return false;
+
+
+        });
+        popupMenu.show();
     }
 
     @Override
@@ -262,7 +431,14 @@ public class FileFragment extends ObservableFragment {
                 actionDescending();
                 return true;
             }
-
+            case R.id.action_storage: {
+                actionStorage();
+                return true;
+            }
+            case R.id.action_sdcard: {
+                actionSdcard();
+                return true;
+            }
         }
         return false;
 
