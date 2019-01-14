@@ -12,6 +12,7 @@ import android.widget.RemoteViews;
 import androidx.core.app.NotificationCompat;
 import euphoria.psycho.funny.service.MusicService;
 import euphoria.psycho.funny.util.AndroidServices;
+import euphoria.psycho.funny.util.debug.Log;
 
 public class NotificationHelper {
     private static final int MUSIC_SERVICE = 1 << 1;
@@ -29,6 +30,7 @@ public class NotificationHelper {
     }
 
     public void buildNotification(String trackName, String artistName, Bitmap album, boolean isPlaying) {
+        Log.e("MusicService","[buildNotification] ---> ");
         mRemoteView = new RemoteViews(mService.getPackageName(), R.layout.notification);
         initializeCollapsedLayout(trackName, artistName, album);
         PendingIntent intent = PendingIntent.getActivity(mService, 0, new Intent(ACTION_AUDIO_PLAY).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0);

@@ -423,7 +423,7 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
             case AUDIO:
                 Intent musicService = new Intent(getContext(), MusicService.class);
                 musicService.putExtra(EXTRA_PATH, fileItem.getPath());
-                musicService.setAction(MusicService.ACTION_TOGGLE_PAUSE);
+                musicService.setAction(MusicService.ACTION_PLAY);
                 getActivity().startService(musicService);
 
                 break;

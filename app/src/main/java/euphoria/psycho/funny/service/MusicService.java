@@ -144,8 +144,12 @@ public class MusicService extends Service {
                 pause();
                 mPaused = false;
             } else {
+
                 play();
             }
+        } else if (action.equals(ACTION_PLAY)) {
+            mPlayer.setDataSource(mPlayList.get(mPosition).path);
+            play();
         } else if (action.equals(ACTION_NEXT)) {
             next();
         }
@@ -156,7 +160,9 @@ public class MusicService extends Service {
     }
 
     private void next() {
+
         if (!mPlayer.isInitialized()) {
+
             mPlayer.setDataSource(mPlayList.get(mPosition).path);
         } else {
             stop(false);
@@ -197,6 +203,7 @@ public class MusicService extends Service {
         }
         if (mPlayer.isInitialized()) {
             setNextTrack();
+
             mPlayer.start();
             mPlayerHandler.removeMessages(FADEDOWN);
             mPlayerHandler.sendEmptyMessage(FADEUP);
@@ -438,7 +445,7 @@ public class MusicService extends Service {
                 }
                 player.prepare();
             } catch (Exception e) {
-                Log.e(TAG, "[setDataSourceImpl]: " + e.getMessage());
+                Log.e(TAG, "[setDataSourceImpl] ---> ", e);
                 return false;
             }
             player.setOnCompletionListener(this);
@@ -463,6 +470,7 @@ public class MusicService extends Service {
             intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, getAudioSessionId());
             intent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, mService.get().getPackageName());
             mService.get().sendBroadcast(intent);
+            Log.e(TAG, "[setDataSourceImpl] ---> ");
             return true;
         }
 
