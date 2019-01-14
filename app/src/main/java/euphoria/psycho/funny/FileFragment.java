@@ -83,6 +83,8 @@ public class FileFragment extends ObservableFragment implements FileAdapter.Call
     }
 
     private void actionDescending() {
+
+
         sortByDirection(false);
     }
 
@@ -334,6 +336,17 @@ public class FileFragment extends ObservableFragment implements FileAdapter.Call
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        if (mSortAscending) {
+            menu.findItem(R.id.action_ascending).setChecked(true);
+        } else {
+            menu.findItem(R.id.action_descending).setChecked(false);
+        }
+        super.onPrepareOptionsMenu(menu);
+
+    }
+
+    @Override
     public void onItemCheckedChanged(FileItem fileItem, boolean selected) {
 
     }
@@ -423,11 +436,13 @@ public class FileFragment extends ObservableFragment implements FileAdapter.Call
             }
 
             case R.id.action_ascending: {
+                item.setChecked(true);
                 actionAscending();
                 return true;
             }
 
             case R.id.action_descending: {
+                item.setChecked(true);
                 actionDescending();
                 return true;
             }
