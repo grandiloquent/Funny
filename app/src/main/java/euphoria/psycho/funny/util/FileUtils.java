@@ -2,6 +2,7 @@ package euphoria.psycho.funny.util;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.view.WindowManager;
@@ -11,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -136,9 +138,9 @@ public class FileUtils {
         return directory.delete();
     }
 
-    public static boolean deleteFile(Context context, String treeUri, String fullPath) {
+    public static boolean deleteFile(Context context, String fullPath) {
         if (fullPath.startsWith(getRemovableStoragePath())) {
-            DocumentFile documentFile = getDocumentFile(context, fullPath, Uri.parse(treeUri));
+            DocumentFile documentFile = getDocumentFile(context, fullPath, Uri.parse(sTreeUri));
             return documentFile.delete();
 
         } else {
@@ -353,6 +355,30 @@ public class FileUtils {
             builder.append(buffer, 0, read);
         }
         return builder.toString();
+    }
+
+    public static boolean renameFile(Context context,  String source, String destination) {
+        if (source.equals(destination)) return false;
+        File sourceFile = new File(source);
+        if (!sourceFile.isFile()) return false;
+        File dstFile = new File(destination);
+        if (dstFile.isFile()) return false;
+
+        if (source.startsWith(getRemovableStoragePath())) {
+            DocumentFile documentFile = getDocumentFile(context, sourceFile.getAbsolutePath(), Uri.parse(sTreeUri));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                try {
+                    return DocumentsContract.renameDocument(context.getContentResolver(),
+                            documentFile.getUri(), dstFile.getName()) == null ? false : true;
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+        } else {
+            return sourceFile.renameTo(dstFile);
+        }
+        return false;
     }
 
     public static void showFileDialog(Context context,

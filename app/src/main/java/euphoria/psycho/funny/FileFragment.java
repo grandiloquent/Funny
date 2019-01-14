@@ -9,13 +9,17 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 
 
 import org.json.JSONArray;
@@ -42,6 +46,7 @@ import javax.net.ssl.HttpsURLConnection;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -123,11 +128,28 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
     }
 
     private void actionCopyName(FileItem item) {
-
+        Simple.setClipboardText(getContext(), FileUtils.getFileNameWithoutExtension(item.getName()));
     }
 
     private void actionDelete(FileItem item) {
+        Context context = getContext();
+        StringBuilder builder = new StringBuilder();
 
+        builder.append(item.getName()).append('\n');
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog_file_delete, null);
+        TextView textView = view.findViewById(R.id.content);
+        textView.setText(builder.toString());
+        new AlertDialog.Builder(context)
+                .setView(view)
+                .setNegativeButton(android.R.string.cancel, ((dialog1, which) -> {
+                    dialog1.dismiss();
+                }))
+                .setPositiveButton(android.R.string.ok, (dialog1, which) -> {
+                    dialog1.dismiss();
+                    FileUtils.deleteFile(context, item.getPath());
+                    refreshRecyclerView();
+                })
+                .show();
     }
 
     private void actionDescending() {
@@ -141,7 +163,29 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
     }
 
     private void actionRename(FileItem item) {
-
+        Context context = getContext();
+        String fileName = item.getName();
+        EditText editText = new EditText(context);
+        if (!TextUtils.isEmpty(fileName)) {
+            editText.setText(fileName);
+            int position = fileName.lastIndexOf('.');
+            if (position != -1) {
+                editText.setSelection(0, position);
+            }
+        }
+        AlertDialog alertDialog = new AlertDialog.Builder(context)
+                .setView(editText)
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    dialog.dismiss();
+                    String destination = FileUtils.changeFileName(item.getPath(), editText.getText().toString());
+                    FileUtils.renameFile(context, item.getPath(), destination);
+                    refreshRecyclerView();
+                }).create();
+        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        alertDialog.show();
     }
 
     private void actionSdcard() {
@@ -413,10 +457,9 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
         String dir = mPreferences.getString(KEY_DIRECTORY, FileUtils.getExternalStorageDirectoryPath());
         FileUtils.initialize(mPreferences.getString(KEY_TREE_URI, null));
         mDirectory = new File(dir);
-        int sortBy = mPreferences.getInt(KEY_DIRECTORY, FileItem.FileSort.NAME.getValue());
+        int sortBy = mPreferences.getInt(KEY_SORT_BY, FileItem.FileSort.NAME.getValue());
         mSort = FileItem.FileSort.get(sortBy);
-        int sortDirection = mPreferences.getInt(KEY_SORT_DIRECTION, 1);
-        mSortAscending = sortDirection == 1;
+        mSortAscending = mPreferences.getBoolean(KEY_SORT_DIRECTION, false);
         setHasOptionsMenu(true);
     }
 
@@ -590,13 +633,23 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
                 actionSdcard();
                 return true;
             }
-            case R.id.action_collect_name:{
+            case R.id.action_collect_name: {
                 actionCollectName();
                 return true;
             }
         }
         return false;
 
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPreferences.edit().putString(KEY_DIRECTORY, mDirectory.getAbsolutePath())
+                .putInt(KEY_SORT_BY, mSort.getValue())
+                .putBoolean(KEY_SORT_DIRECTION, mSortAscending)
+                .apply();
 
     }
 

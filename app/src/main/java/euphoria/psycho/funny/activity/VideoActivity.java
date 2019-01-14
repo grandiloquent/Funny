@@ -81,7 +81,7 @@ public class VideoActivity extends BaseVideoActivity implements
         TimeBar.OnScrubListener {
     public static final long DEFAULT_SHOW_TIMEOUT_MS = 5000L;
     public static final String KEY_SORT_BY = "sort_by";
-    public static final String KEY_SORT_DIRECTION = "sort_direction";
+    public static final String KEY_SORT_DIRECTION = "sort_direction_video";
     private static final String TAG = "VideoActivity";
     private final DefaultControlDispatcher mControlDispatcher = new DefaultControlDispatcher();
     private final FileDataSourceFactory mFileDataSourceFactory = new FileDataSourceFactory();
