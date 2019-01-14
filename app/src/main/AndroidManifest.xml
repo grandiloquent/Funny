@@ -23,7 +23,9 @@
 
         </activity>
         <activity android:name=".activity.VideoActivity" />
+        <activity android:name=".activity.ServerActivity" />
 
         <service android:name=".service.MusicService" />
+        <service android:name=".service.ServerService" />
     </application>
 </manifest>

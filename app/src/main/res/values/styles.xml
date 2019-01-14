@@ -8,6 +8,11 @@
         <item name="colorAccent">@color/colorAccent</item>
 
     </style>
+    <style name="Toolbar" parent="@style/ThemeOverlay.AppCompat.ActionBar">
+        <item name="colorControlNormal">@android:color/white</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:itemBackground">#333</item>
+    </style>
 
     <style name="ToolbarDarkOverflow" parent="ThemeOverlay.AppCompat.ActionBar">
         <!-- android:textColorPrimary is the  color of the title text

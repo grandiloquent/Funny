@@ -19,6 +19,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import euphoria.psycho.funny.activity.ServerActivity;
 import euphoria.psycho.funny.util.AndroidServices;
 import euphoria.psycho.funny.util.debug.Log;
 import euphoria.psycho.funny.util.BaseAppCompatActivity;
@@ -48,6 +49,10 @@ public class MainActivity extends BaseAppCompatActivity {
             }
             case R.id.action_hidden_camera:
                 break;
+            case R.id.action_server:
+                Intent intent = new Intent(this, ServerActivity.class);
+                startActivity(intent);
+                return true;
         }
         if (fragmentClass != null) {
             try {
@@ -118,7 +123,6 @@ public class MainActivity extends BaseAppCompatActivity {
 
 
     }
-
 
 
     @Override

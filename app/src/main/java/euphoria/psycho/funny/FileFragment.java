@@ -147,7 +147,7 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
                 .setPositiveButton(android.R.string.ok, (dialog1, which) -> {
                     dialog1.dismiss();
                     FileUtils.deleteFile(context, item.getPath());
-                    refreshRecyclerView();
+                    updateRecyclerView();
                 })
                 .show();
     }
@@ -182,7 +182,7 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
                     dialog.dismiss();
                     String destination = FileUtils.changeFileName(item.getPath(), editText.getText().toString());
                     FileUtils.renameFile(context, item.getPath(), destination);
-                    refreshRecyclerView();
+                    updateRecyclerView();
                 }).create();
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alertDialog.show();
@@ -370,6 +370,14 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
         List<FileItem> items = getFileItems(mDirectory);
         ThreadUtils.postOnMainThread(() -> {
             mFileAdapter.setFileItems(items);
+        });
+    }
+
+    @WorkerThread
+    private void updateRecyclerView() {
+        List<FileItem> items = getFileItems(mDirectory);
+        ThreadUtils.postOnMainThread(() -> {
+            mFileAdapter.updateFileItems(items);
         });
     }
 
