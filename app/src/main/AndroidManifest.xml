@@ -22,5 +22,6 @@
         <activity android:name=".hidden.HiddenCameraActivity">
 
         </activity>
+        <activity android:name=".activity.VideoActivity" />
     </application>
 </manifest>

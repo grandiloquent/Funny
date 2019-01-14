@@ -2,8 +2,6 @@ package euphoria.psycho.funny;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.Telephony;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,7 +11,6 @@ import android.view.ViewGroup;
 
 
 import java.io.File;
-import java.io.FileFilter;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,16 +21,14 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import euphoria.psycho.funny.ui.SwipeLayout;
 import euphoria.psycho.funny.util.AndroidServices;
-import euphoria.psycho.funny.util.ComparatorUtils;
+import euphoria.psycho.funny.util.FileUtils;
 import euphoria.psycho.funny.util.Simple;
 import euphoria.psycho.funny.util.ThreadUtils;
-import euphoria.psycho.funny.util.debug.Log;
 import euphoria.psycho.funny.util.lifecycle.ObservableFragment;
 
 // https://developer.android.com/guide/components/fragments
@@ -96,11 +91,11 @@ public class FileFragment extends ObservableFragment {
                 fileItem.setSize(f.listFiles().length);
                 fileItem.setDescription(fileItem.getSize() + "  个");
             } else {
-                if (Simple.isVideo(f)) {
+                if (FileUtils.isVideo(f)) {
                     fileItem.setType(FileItem.FileType.VIDEO);
-                } else if (Simple.isAudio(f)) {
+                } else if (FileUtils.isAudio(f)) {
                     fileItem.setType(FileItem.FileType.AUDIO);
-                } else if (Simple.isSubTitle(f)) {
+                } else if (FileUtils.isSubTitle(f)) {
                     fileItem.setType(FileItem.FileType.TEXT);
                 } else {
                     skip = true;

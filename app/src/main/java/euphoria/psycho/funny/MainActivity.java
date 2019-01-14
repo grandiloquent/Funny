@@ -98,10 +98,7 @@ public class MainActivity extends BaseAppCompatActivity {
     @Override
     public void initialize() {
         super.initialize();
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.content, new FileFragment())
-                .commit();
+
     }
 
     @Override

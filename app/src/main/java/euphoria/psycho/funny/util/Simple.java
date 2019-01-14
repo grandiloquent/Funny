@@ -28,35 +28,14 @@ import java.util.Objects;
 
 public class Simple {
     public static final String PATH_CPU = "/sys/devices/system/cpu/";
-    private static final String[] sAudioExtensions = new String[]{
-            ".m4a",
-            ".aac",
-            ".flac",
-            ".gsm",
-            ".mid",
-            ".xmf",
-            ".mxmf",
-            ".rtttl",
-            ".rtx",
-            ".ota",
-            ".imy",
-            ".mp3",
-            ".wav",
-            ".ogg"
-    };
+
     private static float sPixelDensity = -1f;
-    private static final String[] sSubTitleExtensions = new String[]{
-            ".srt",
-            ".txt",
-            ".htm"
-    };
-    private static final String[] sVideoExtensions = new String[]{
-            ".3gp",
-            ".mp4",
-            ".ts",
-            ".webm",
-            ".mkv",
-    };
+
+    public static void assertTrue(boolean cond) {
+        if (!cond) {
+            throw new AssertionError();
+        }
+    }
 
     public static boolean checkExternalStorage() {
         return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
@@ -77,11 +56,7 @@ public class Simple {
         } catch (IOException t) {
         }
     }
-    public static void assertTrue(boolean cond) {
-        if (!cond) {
-            throw new AssertionError();
-        }
-    }
+
     public static boolean deleteDirectoryRecursively(File directory) {
         if (!directory.exists() || !directory.isDirectory()) {
             return false;
@@ -189,14 +164,12 @@ public class Simple {
         sPixelDensity = metrics.density;
     }
 
-    public static boolean isAudio(File file) {
-        String ext = getExtension(file.getName());
-        if (ext == null) return false;
-        return linearSearch(sAudioExtensions, ext) != -1;
-    }
-
     public static <T> boolean isEmpty(T[] array) {
         return array == null || array.length == 0;
+    }
+
+    public static boolean isNullOrEmpty(String str) {
+        return str == null || str.length() == 0;
     }
 
     public static boolean isNullOrWhiteSpace(CharSequence charSequence) {
@@ -215,18 +188,6 @@ public class Simple {
             if (t1[i] != t2[i]) return false;
         }
         return true;
-    }
-
-    public static boolean isSubTitle(File file) {
-        String ext = getExtension(file.getName());
-        if (ext == null) return false;
-        return linearSearch(sSubTitleExtensions, ext) != -1;
-    }
-
-    public static boolean isVideo(File file) {
-        String ext = getExtension(file.getName());
-        if (ext == null) return false;
-        return linearSearch(sVideoExtensions, ext) != -1;
     }
 
     public static <T> String joining(List<T> list, String separator) {
