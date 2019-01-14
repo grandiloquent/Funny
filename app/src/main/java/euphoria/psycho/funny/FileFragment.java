@@ -16,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
-import android.widget.Toast;
 
 
 import org.json.JSONArray;
@@ -28,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,6 +35,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -44,7 +45,6 @@ import androidx.annotation.WorkerThread;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import euphoria.psycho.funny.activity.VideoActivity;
 import euphoria.psycho.funny.service.MusicService;
 import euphoria.psycho.funny.ui.SwipeLayout;
@@ -63,6 +63,7 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
     public static final String EXTRA_PATH = "_tag_";
     public static final String EXTRA_REFRESH = "refresh";
     public static final int REQUEST_OPEN_DOCUMENT_TREE = 100;
+    private static final String DEFAULT_DIRECTORY_NAME = "Videos";
     private static final String KEY_DIRECTORY = "directory";
     private static final String KEY_SORT_BY = "sort_by";
     private static final String KEY_SORT_DIRECTION = "sort_direction";
@@ -84,7 +85,41 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
         sortByDirection(true);
     }
 
-    private void actionConvertToUtf8(FileItem item) {
+    protected void actionCollectName() {
+
+        List<String> names = new ArrayList<>();
+
+        File f1 = new File(Environment.getExternalStorageDirectory(), DEFAULT_DIRECTORY_NAME);
+
+        File f2 = new File(FileUtils.getRemovableStoragePath(), DEFAULT_DIRECTORY_NAME);
+
+        listVideoFiles(f1, names);
+        listVideoFiles(f2, names);
+
+        Collections.sort(names, String::compareToIgnoreCase);
+
+        names = Simple.distinct(names);
+
+        StringBuilder sb = new StringBuilder();
+
+        for (String n : names) {
+            sb.append(n).append('\n');
+        }
+
+        Simple.setClipboardText(getContext(), Simple.sort(sb.toString()));
+    }
+
+    private void actionConvertToUtf8(FileItem fileItem) {
+        try {
+            byte[] buffer = FileUtils.readAllBytes(new File(fileItem.getPath()));
+
+            String s = new String(buffer, Charset.forName("gbk"));
+            File target = new File(Environment.getExternalStorageDirectory(), fileItem.getName());
+            FileUtils.writeAllText(target, "UTF8", s);
+            Simple.toast(this, target.getAbsolutePath(), true);
+        } catch (IOException e) {
+            Simple.toast(this, e.getMessage(), true);
+        }
     }
 
     private void actionCopyName(FileItem item) {
@@ -296,9 +331,10 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
 
     private void saveTreeUri(Intent data) {
         Uri treeUri = data.getData();
-        AndroidServices.instance().providePreferences().edit().putString(KEY_TREE_URI, treeUri.toString()).apply();
+        mPreferences.edit().putString(KEY_TREE_URI, treeUri.toString()).apply();
         int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
         AndroidContext.instance().get().getContentResolver().takePersistableUriPermission(treeUri, takeFlags);
+        FileUtils.initialize(treeUri.toString());
     }
 
     private void setSwipeLayout(View view) {
@@ -316,6 +352,22 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
         mSortAscending = ascending;
         mPreferences.edit().putInt(KEY_SORT_DIRECTION, mSortAscending ? 1 : 0).apply();
         refreshRecyclerView();
+    }
+
+    protected static void listVideoFiles(File f1, List<String> names) {
+        Pattern pattern = Pattern.compile("\\([0-9]{4}\\)");
+        if (f1.isDirectory()) {
+            File[] files = f1.listFiles(pathname -> {
+                if (pathname.isFile() && pathname.getName().toLowerCase().endsWith(".mp4") && pattern.matcher(pathname.getName()).find())
+                    return true;
+                return false;
+            });
+            if (files != null) {
+                for (File f : files) {
+                    names.add(FileUtils.getFileNameWithoutExtension(f.getName()));
+                }
+            }
+        }
     }
 
     @Override
@@ -357,8 +409,9 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
         super.onCreate(savedInstanceState);
         mPreferences = AndroidServices.instance().providePreferences();
 
-        String dir = mPreferences.getString(KEY_DIRECTORY, FileUtils.getExternalStorageDirectoryPath());
 
+        String dir = mPreferences.getString(KEY_DIRECTORY, FileUtils.getExternalStorageDirectoryPath());
+        FileUtils.initialize(mPreferences.getString(KEY_TREE_URI, null));
         mDirectory = new File(dir);
         int sortBy = mPreferences.getInt(KEY_DIRECTORY, FileItem.FileSort.NAME.getValue());
         mSort = FileItem.FileSort.get(sortBy);
@@ -535,6 +588,10 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
             }
             case R.id.action_sdcard: {
                 actionSdcard();
+                return true;
+            }
+            case R.id.action_collect_name:{
+                actionCollectName();
                 return true;
             }
         }

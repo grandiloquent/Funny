@@ -1,6 +1,8 @@
 package euphoria.psycho.funny.util;
 
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
@@ -213,6 +215,7 @@ public class Simple {
 
 
     }
+
     public static boolean endWiths(String value, String suffix, boolean ignoreCase) {
         int s = suffix.length();
         int v = value.length();
@@ -232,6 +235,7 @@ public class Simple {
         }
         return true;
     }
+
     public static String sort(String s, Comparator<String> comparator) {
         if (s == null) return null;
         String[] lines = s.split("\n");
@@ -272,6 +276,38 @@ public class Simple {
         if (index == -1)
             return null;
         return value.substring(0, index);
+    }
+
+    public static String sort(String value) {
+        String[] lines = value.split("\n");
+        List<String> list = new ArrayList<>();
+        for (String l : lines) {
+            list.add(l.trim());
+        }
+        Collections.sort(list, String::compareToIgnoreCase);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String l : list) {
+            stringBuilder.append(l).append('\n');
+        }
+        return stringBuilder.toString();
+
+    }
+    public static <T> List<T> distinct(List<T> source) {
+        List<T> r = new ArrayList<>();
+        int length = source.size();
+        for (int i = 0; i < length; i++) {
+
+            while (i + 1 < length && source.get(i).equals(source.get(i + 1))) {
+                i++;
+            }
+            r.add(source.get(i));
+        }
+        return r;
+    }
+    public static void setClipboardText(Context context, String s) {
+        ClipboardManager manager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        manager.setPrimaryClip(ClipData.newPlainText("", s));
     }
 
     public static void toast(Fragment fragment, String message, boolean showLong) {

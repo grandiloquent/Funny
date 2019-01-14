@@ -46,8 +46,7 @@ public class FileUtils {
     private static String sRemovablePath = null;
     private static final String[] sSubTitleExtensions = new String[]{
             ".srt",
-            ".txt",
-            ".htm"
+            ".vtt"
     };
     private static String sTreeUri;
     private static final String[] sVideoExtensions = new String[]{

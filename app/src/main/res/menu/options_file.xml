@@ -8,6 +8,9 @@
         android:id="@+id/action_storage"
         android:title="@string/menu_storage" />
     <item
+        android:id="@+id/action_collect_name"
+        android:title="收集视频文件名" />
+    <item
         android:id="@+id/action_sort_by_name"
         android:title="名称" />
     <item
