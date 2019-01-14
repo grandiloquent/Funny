@@ -25,5 +25,7 @@
 
         </activity>
         <activity android:name=".activity.VideoActivity" />
+
+        <service android:name=".service.MusicService" />
     </application>
 </manifest>

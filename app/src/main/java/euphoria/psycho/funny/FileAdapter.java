@@ -58,6 +58,7 @@ public class FileAdapter extends SelectableAdapter<FileAdapter.ViewHolder> imple
     }
 
     public void setFileItems(List<FileItem> fileItems) {
+        if (fileItems == null) return;
         mFileItems.clear();
         mFileItems.addAll(fileItems);
         notifyDataSetChanged();

@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -40,6 +41,8 @@ import androidx.annotation.WorkerThread;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import euphoria.psycho.funny.activity.VideoActivity;
+import euphoria.psycho.funny.service.MusicService;
 import euphoria.psycho.funny.ui.SwipeLayout;
 import euphoria.psycho.funny.util.AndroidServices;
 import euphoria.psycho.funny.util.FileUtils;
@@ -47,12 +50,17 @@ import euphoria.psycho.funny.util.Simple;
 import euphoria.psycho.funny.util.ThreadUtils;
 import euphoria.psycho.funny.util.lifecycle.ObservableFragment;
 
+import static android.app.Activity.RESULT_OK;
+
 // https://developer.android.com/guide/components/fragments
 // https://developer.android.com/reference/android/app/Fragment
 public class FileFragment extends ObservableFragment implements FileAdapter.Callback {
+    public static final String EXTRA_PATH = "_tag_";
+    public static final String EXTRA_REFRESH = "refresh";
     private static final String KEY_DIRECTORY = "directory";
     private static final String KEY_SORT_BY = "sort_by";
     private static final String KEY_SORT_DIRECTION = "sort_direction";
+    private static final int REQUEST_VIDEO_ACTIVITY_CODE = 1;
     private static final String STATE_SCROLL_POSITION = "";
     private static final String TAG = "FileFragment";
     private File mDirectory;
@@ -176,7 +184,7 @@ public class FileFragment extends ObservableFragment implements FileAdapter.Call
 
             if (f.isDirectory()) {
                 fileItem.setType(FileItem.FileType.DIRECTORY);
-                fileItem.setSize(f.listFiles().length);
+                fileItem.setSize(FileUtils.getDirectoryChildCount(f));
                 fileItem.setDescription(fileItem.getSize() + "  个");
             } else {
                 if (FileUtils.isVideo(f)) {
@@ -278,6 +286,32 @@ public class FileFragment extends ObservableFragment implements FileAdapter.Call
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        ((MainActivity) Objects.requireNonNull(getActivity())).setOnBackPressed(() -> {
+            File parent = mDirectory.getParentFile();
+            if (parent != null) {
+                mDirectory = parent;
+                refreshRecyclerView();
+                return true;
+            }
+            return false;
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == REQUEST_VIDEO_ACTIVITY_CODE) {
+            if (resultCode == RESULT_OK
+                    && data != null
+                    && data.getBooleanExtra(EXTRA_REFRESH, false)) {
+                refreshRecyclerView();
+            }
+        }
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreferences = AndroidServices.instance().providePreferences();
@@ -336,23 +370,37 @@ public class FileFragment extends ObservableFragment implements FileAdapter.Call
     }
 
     @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        if (mSortAscending) {
-            menu.findItem(R.id.action_ascending).setChecked(true);
-        } else {
-            menu.findItem(R.id.action_descending).setChecked(false);
-        }
-        super.onPrepareOptionsMenu(menu);
-
-    }
-
-    @Override
     public void onItemCheckedChanged(FileItem fileItem, boolean selected) {
 
     }
 
     @Override
     public void onItemClicked(int position, FileItem fileItem) {
+        FileItem.FileType type = fileItem.getType();
+
+        switch (type) {
+
+            case VIDEO:
+                Intent videoActivity = new Intent(getContext(), VideoActivity.class);
+                videoActivity.setData(Uri.fromFile(new File(fileItem.getPath())));
+                startActivityForResult(videoActivity, REQUEST_VIDEO_ACTIVITY_CODE);
+                break;
+            case AUDIO:
+                Intent musicService = new Intent(getContext(), MusicService.class);
+                musicService.putExtra(EXTRA_PATH, fileItem.getPath());
+                musicService.setAction(MusicService.ACTION_TOGGLE_PAUSE);
+                getActivity().startService(musicService);
+
+                break;
+            case DIRECTORY:
+                mDirectory = new File(fileItem.getPath());
+                refreshRecyclerView();
+                break;
+            case TEXT:
+                break;
+            case OTHER:
+                break;
+        }
 
     }
 
@@ -457,6 +505,17 @@ public class FileFragment extends ObservableFragment implements FileAdapter.Call
         }
         return false;
 
+
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        if (mSortAscending) {
+            menu.findItem(R.id.action_ascending).setChecked(true);
+        } else {
+            menu.findItem(R.id.action_descending).setChecked(false);
+        }
+        super.onPrepareOptionsMenu(menu);
 
     }
 }

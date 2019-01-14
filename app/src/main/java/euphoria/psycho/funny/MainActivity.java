@@ -106,6 +106,23 @@ public class MainActivity extends BaseAppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        if (mOnBackPressed == null || !mOnBackPressed.onPressed())
+            super.onBackPressed();
+    }
+
+    public interface OnBackPressed {
+        boolean onPressed();
+
+    }
+
+    public void setOnBackPressed(OnBackPressed onBackPressed) {
+        mOnBackPressed = onBackPressed;
+    }
+
+    private OnBackPressed mOnBackPressed;
+
+    @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
