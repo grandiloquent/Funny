@@ -3,7 +3,6 @@ package euphoria.psycho.funny;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.view.LayoutInflater;
@@ -12,16 +11,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import euphoria.psycho.funny.util.IconCache;
-import euphoria.psycho.funny.util.lifecycle.Lifecycle;
 
 public class FileAdapter extends SelectableAdapter<FileAdapter.ViewHolder> implements LifecycleObserver {
 
@@ -59,9 +57,41 @@ public class FileAdapter extends SelectableAdapter<FileAdapter.ViewHolder> imple
 
     public void setFileItems(List<FileItem> fileItems) {
         if (fileItems == null) return;
-        mFileItems.clear();
-        mFileItems.addAll(fileItems);
+        mFileItems = fileItems;
         notifyDataSetChanged();
+    }
+
+    public void updateFileItems(List<FileItem> fileItems) {
+        if (fileItems == null) return;
+        if (mFileItems.size() == 0) {
+            mFileItems.addAll(fileItems);
+            notifyDataSetChanged();
+        } else {
+            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override
+                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                    return mFileItems.get(oldItemPosition).equals(fileItems.get(newItemPosition));
+                }
+
+                @Override
+                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                    return mFileItems.get(oldItemPosition).getPath().equals(fileItems.get(newItemPosition).getPath());
+                }
+
+                @Override
+                public int getNewListSize() {
+                    return fileItems.size();
+                }
+
+                @Override
+                public int getOldListSize() {
+                    return mFileItems.size();
+                }
+            });
+            mFileItems = fileItems;
+            result.dispatchUpdatesTo(this);
+        }
+
     }
 
     @Override

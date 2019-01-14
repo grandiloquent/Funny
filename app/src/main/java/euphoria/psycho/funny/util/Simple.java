@@ -213,7 +213,25 @@ public class Simple {
 
 
     }
-
+    public static boolean endWiths(String value, String suffix, boolean ignoreCase) {
+        int s = suffix.length();
+        int v = value.length();
+        if (v < s) return false;
+        int i = 0;
+        while (--s >= 0) {
+            if (ignoreCase) {
+                i++;
+                int a = value.charAt(v - i);
+                int b = suffix.charAt(s);
+                a |= 0x20;
+                b |= 0x20;
+                if (a != b) return false;
+            } else {
+                if (value.charAt(v - s) != suffix.charAt(s)) return false;
+            }
+        }
+        return true;
+    }
     public static String sort(String s, Comparator<String> comparator) {
         if (s == null) return null;
         String[] lines = s.split("\n");

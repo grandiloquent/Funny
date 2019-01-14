@@ -1,7 +1,12 @@
 package euphoria.psycho.funny;
 
 import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -14,6 +19,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import euphoria.psycho.funny.util.AndroidServices;
 import euphoria.psycho.funny.util.debug.Log;
 import euphoria.psycho.funny.util.BaseAppCompatActivity;
 
@@ -23,6 +29,7 @@ public class MainActivity extends BaseAppCompatActivity {
     DrawerLayout mDrawer;
     ActionBarDrawerToggle mDrawerToggle;
     NavigationView mNavigation;
+    private OnBackPressed mOnBackPressed;
 
     private void actionOpenDrawer() {
         mDrawer.openDrawer(GravityCompat.START);
@@ -58,6 +65,10 @@ public class MainActivity extends BaseAppCompatActivity {
 
     }
 
+    public void setOnBackPressed(OnBackPressed onBackPressed) {
+        mOnBackPressed = onBackPressed;
+    }
+
     @Override
     public void bindViews() {
         super.bindViews();
@@ -65,6 +76,7 @@ public class MainActivity extends BaseAppCompatActivity {
         mDrawer = findViewById(R.id.drawer);
         mAppbar = findViewById(R.id.appbar);
         mNavigation = findViewById(R.id.navigation);
+
     }
 
     @Override
@@ -93,8 +105,8 @@ public class MainActivity extends BaseAppCompatActivity {
         mDrawer.addDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         mNavigation.setNavigationItemSelectedListener(this::selectDrawerItem);
-    }
 
+    }
 
     @Override
     public void initialize() {
@@ -103,24 +115,17 @@ public class MainActivity extends BaseAppCompatActivity {
                 .beginTransaction()
                 .replace(R.id.content, new FileFragment())
                 .commit();
+
+
     }
+
+
 
     @Override
     public void onBackPressed() {
         if (mOnBackPressed == null || !mOnBackPressed.onPressed())
             super.onBackPressed();
     }
-
-    public interface OnBackPressed {
-        boolean onPressed();
-
-    }
-
-    public void setOnBackPressed(OnBackPressed onBackPressed) {
-        mOnBackPressed = onBackPressed;
-    }
-
-    private OnBackPressed mOnBackPressed;
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
@@ -148,5 +153,10 @@ public class MainActivity extends BaseAppCompatActivity {
         super.onPostCreate(savedInstanceState);
         if (mDrawerToggle != null)
             mDrawerToggle.syncState();
+    }
+
+    public interface OnBackPressed {
+        boolean onPressed();
+
     }
 }

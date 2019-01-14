@@ -1,9 +1,12 @@
 package euphoria.psycho.funny;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -38,28 +41,32 @@ import javax.net.ssl.HttpsURLConnection;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import euphoria.psycho.funny.activity.VideoActivity;
 import euphoria.psycho.funny.service.MusicService;
 import euphoria.psycho.funny.ui.SwipeLayout;
+import euphoria.psycho.funny.util.AndroidContext;
 import euphoria.psycho.funny.util.AndroidServices;
 import euphoria.psycho.funny.util.FileUtils;
 import euphoria.psycho.funny.util.Simple;
 import euphoria.psycho.funny.util.ThreadUtils;
-import euphoria.psycho.funny.util.lifecycle.ObservableFragment;
+import euphoria.psycho.funny.util.debug.Log;
 
 import static android.app.Activity.RESULT_OK;
 
 // https://developer.android.com/guide/components/fragments
 // https://developer.android.com/reference/android/app/Fragment
-public class FileFragment extends ObservableFragment implements FileAdapter.Callback {
+public class FileFragment extends Fragment implements FileAdapter.Callback {
     public static final String EXTRA_PATH = "_tag_";
     public static final String EXTRA_REFRESH = "refresh";
+    public static final int REQUEST_OPEN_DOCUMENT_TREE = 100;
     private static final String KEY_DIRECTORY = "directory";
     private static final String KEY_SORT_BY = "sort_by";
     private static final String KEY_SORT_DIRECTION = "sort_direction";
+    private static final String KEY_TREE_URI = "tree_uri";
     private static final int REQUEST_VIDEO_ACTIVITY_CODE = 1;
     private static final String STATE_SCROLL_POSITION = "";
     private static final String TAG = "FileFragment";
@@ -74,12 +81,10 @@ public class FileFragment extends ObservableFragment implements FileAdapter.Call
     private SwipeLayout mSwipeLayout;
 
     private void actionAscending() {
-
         sortByDirection(true);
     }
 
     private void actionConvertToUtf8(FileItem item) {
-
     }
 
     private void actionCopyName(FileItem item) {
@@ -148,6 +153,17 @@ public class FileFragment extends ObservableFragment implements FileAdapter.Call
         mDirectory = new File(FileUtils.getRemovableStoragePath(), "Videos");
         refreshRecyclerView();
 
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void checkStoragePermission() {
+        if (AndroidServices.instance().providePreferences().getString(KEY_TREE_URI, null) == null) {
+            final Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+//            intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
+//            intent.putExtra("android.content.extra.FANCY", true);
+//            intent.putExtra("android.content.extra.SHOW_FILESIZE", true);
+            startActivityForResult(intent, REQUEST_OPEN_DOCUMENT_TREE);
+        }
     }
 
     @WorkerThread
@@ -275,8 +291,25 @@ public class FileFragment extends ObservableFragment implements FileAdapter.Call
         List<FileItem> items = getFileItems(mDirectory);
         ThreadUtils.postOnMainThread(() -> {
             mFileAdapter.setFileItems(items);
-            mSwipeLayout.setRefreshing(false);
         });
+    }
+
+    private void saveTreeUri(Intent data) {
+        Uri treeUri = data.getData();
+        AndroidServices.instance().providePreferences().edit().putString(KEY_TREE_URI, treeUri.toString()).apply();
+        int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+        AndroidContext.instance().get().getContentResolver().takePersistableUriPermission(treeUri, takeFlags);
+    }
+
+    private void setSwipeLayout(View view) {
+        mSwipeLayout = view.findViewById(R.id.swipe);
+        mSwipeLayout.setRefreshListener(() -> ThreadUtils.postOnBackgroundThread(() -> {
+            List<FileItem> items = getFileItems(mDirectory);
+            ThreadUtils.postOnMainThread(() -> {
+                mFileAdapter.updateFileItems(items);
+            });
+            mSwipeLayout.setRefreshing(false);
+        }));
     }
 
     private void sortByDirection(boolean ascending) {
@@ -298,16 +331,24 @@ public class FileFragment extends ObservableFragment implements FileAdapter.Call
             }
             return false;
         });
+        checkStoragePermission();
+
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        Log.e(TAG, "[onActivityResult] ---> ");
+        super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == REQUEST_VIDEO_ACTIVITY_CODE) {
             if (resultCode == RESULT_OK
                     && data != null
                     && data.getBooleanExtra(EXTRA_REFRESH, false)) {
                 refreshRecyclerView();
             }
+        }
+        if (requestCode == REQUEST_OPEN_DOCUMENT_TREE && resultCode == Activity.RESULT_OK && data != null) {
+            saveTreeUri(data);
         }
     }
 
@@ -346,13 +387,7 @@ public class FileFragment extends ObservableFragment implements FileAdapter.Call
             return null;
         }
         View view = inflater.inflate(R.layout.fragment_file, container, false);
-        mSwipeLayout = view.findViewById(R.id.swipe);
-        mSwipeLayout.setRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                ThreadUtils.postOnBackgroundThread(FileFragment.this::refreshRecyclerView);
-            }
-        });
+        setSwipeLayout(view);
         mRecyclerView = view.findViewById(R.id.recycler);
         mLayoutManager = new LinearLayoutManager(context);
         mLayoutManager.setOrientation(RecyclerView.VERTICAL);

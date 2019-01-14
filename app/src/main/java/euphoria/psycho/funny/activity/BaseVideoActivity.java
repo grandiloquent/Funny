@@ -1,5 +1,6 @@
 package euphoria.psycho.funny.activity;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -39,7 +40,6 @@ import euphoria.psycho.funny.ui.SubtitleView;
 
 public abstract class BaseVideoActivity extends AppCompatActivity {
     static final String KEY_TREE_URI = "tree_uri";
-    static final int REQUEST_OPEN_DOCUMENT_TREE = 1 << 1;
     LinearLayout mController;
     AspectRatioFrameLayout mExoContentFrame;
     TextView mExoDuration;
@@ -73,12 +73,6 @@ public abstract class BaseVideoActivity extends AppCompatActivity {
         }
     }
 
-    private void checkStoragePermission() {
-        if (mPreferences.getString(KEY_TREE_URI, null) == null) {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-            startActivityForResult(intent, REQUEST_OPEN_DOCUMENT_TREE);
-        }
-    }
 
     int getDisplayRotation() {
         int rotation = getWindowManager().getDefaultDisplay().getRotation();
@@ -127,7 +121,7 @@ public abstract class BaseVideoActivity extends AppCompatActivity {
 
     void initialize() {
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        checkStoragePermission();
+
         mIsHasBar = hasNavBar();
         setContentView(R.layout.activity_video);
         mRootView = findViewById(R.id.root_view);
@@ -148,13 +142,7 @@ public abstract class BaseVideoActivity extends AppCompatActivity {
         mTextureView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         mExoContentFrame.addView(mTextureView, 0);
-    }
 
-    private void saveTreeUri(Intent data) {
-        Uri treeUri = data.getData();
-        mPreferences.edit().putString(KEY_TREE_URI, treeUri.toString()).apply();
-        int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
-        getApplicationContext().getContentResolver().takePersistableUriPermission(treeUri, takeFlags);
     }
 
     void showSystemUI(boolean toggleActionBarVisibility) {
@@ -209,13 +197,6 @@ public abstract class BaseVideoActivity extends AppCompatActivity {
         return size;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_OPEN_DOCUMENT_TREE && resultCode == Activity.RESULT_OK && data != null) {
-            saveTreeUri(data);
-        }
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

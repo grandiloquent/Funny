@@ -2,9 +2,8 @@ package euphoria.psycho.funny;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import java.io.File;
-import euphoria.psycho.common.Shared;
-import static euphoria.psycho.common.CheckUtils.isEmpty;
-import static euphoria.psycho.utils.FileUtils.getFileName;
+import static euphoria.psycho.funny.util.FileUtils.getFileName;
+import static euphoria.psycho.funny.util.Simple.endWiths;
 public class MediaUtils {
     private final static String TAG = "MediaUtils";
     private static String[] sAudioExtensions;
@@ -78,7 +77,7 @@ public class MediaUtils {
     public static boolean isAudioFile(File file) {
         String name = file.getName();
         for (String sAudioExtension : sAudioExtensions) {
-            if (Shared.endWiths(name, sAudioExtension, true)) {
+            if ( endWiths(name, sAudioExtension, true)) {
                 return true;
             }
         }

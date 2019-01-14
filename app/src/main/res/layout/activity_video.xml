@@ -73,7 +73,7 @@
                 android:textColor="#FFBEBEBE"
                 android:textSize="14sp"
                 android:textStyle="bold" />
-            <euphoria.psycho.player.DefaultTimeBar
+            <euphoria.psycho.funny.ui.DefaultTimeBar
                 android:id="@+id/exo_progress"
                 android:layout_width="0dp"
                 android:layout_height="26dp"
