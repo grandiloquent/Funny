@@ -236,15 +236,21 @@ public class ServerActivity extends BaseAppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         if (mBound) {
-            try{
-            unbindService(mConnection);
-            mBound = false;
-        }catch (Exception e){
-                Log.e(TAG,"[onStop] ---> ",e);
+            try {
+                unbindService(mConnection);
+                mBound = false;
+            } catch (Exception e) {
+                Log.e(TAG, "[onStop] ---> ", e);
             }
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
     }
 }

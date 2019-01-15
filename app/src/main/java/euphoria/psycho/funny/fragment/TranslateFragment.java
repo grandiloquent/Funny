@@ -1,5 +1,6 @@
 package euphoria.psycho.funny.fragment;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -34,6 +36,7 @@ import euphoria.psycho.funny.util.debug.Log;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class TranslateFragment extends Fragment {
     private static final String LANGUAGE_AUTO = "auto";
@@ -99,19 +102,21 @@ public class TranslateFragment extends Fragment {
                     .connectTimeout(10, TimeUnit.SECONDS)
                     .readTimeout(10, TimeUnit.SECONDS)
                     .build().newCall(request).execute();
+
             if (response.isSuccessful()) {
                 try {
-                    return parseJSON(response.toString());
+                    ResponseBody responseBody = response.body();
+                    if (responseBody == null) return null;
+                    return parseJSON(responseBody.string());
                 } catch (JSONException e) {
-                    Log.e(TAG,"[query] ---> ",e);
-                    return null;
+                    return e.getMessage();
                 }
             } else {
                 return null;
             }
         } catch (IOException e) {
-            Log.e(TAG, "[query] ---> ", e);
-            return null;
+
+            return e.getMessage();
         }
 
 
@@ -128,11 +133,12 @@ public class TranslateFragment extends Fragment {
 
         mEnglish.setOnClickListener(v ->
         {
-            executeQuery(LANGUAGE_EN, LANGUAGE_ZH);
+            executeQuery(LANGUAGE_ZH, LANGUAGE_EN);
 
         });
         mChinese.setOnClickListener(v -> {
-            executeQuery(LANGUAGE_ZH, LANGUAGE_EN);
+            executeQuery(LANGUAGE_EN, LANGUAGE_ZH);
+
         });
         return view;
     }
