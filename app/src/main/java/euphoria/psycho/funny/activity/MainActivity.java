@@ -118,7 +118,7 @@ public class MainActivity extends BaseAppCompatActivity {
         super.initialize();
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.content, new DownloadFragment())
+                .replace(R.id.content, new FileFragment())
                 .commit();
 
 

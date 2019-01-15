@@ -61,7 +61,7 @@ public class SimpleServer {
     private static final int STATUS_CODE_NOT_FOUND = 404;
     private static final int STATUS_CODE_OK = 200;
     private static final int STATUS_CODE_PARTIAL_CONTENT = 206;
-    private static final String TAG = "Server";
+    private static final String TAG = "Funny/SimpleServer";
     private static final String UTF_8 = "UTF-8";
     private static final byte[] mBytesDropZone = new byte[]{60, 100, 105, 118, 32, 105, 100, 61, 34, 100, 114, 111, 112, 122, 111, 110, 101, 34, 62, 60, 102, 111, 114, 109, 32, 99, 108, 97, 115, 115, 61, 34, 100, 114, 111, 112, 122, 111, 110, 101, 34, 32, 97, 99, 116, 105, 111, 110, 61, 34, 47, 117, 112, 108, 111, 97, 100, 34, 62, 60, 47, 102, 111, 114, 109, 62, 60, 47, 100, 105, 118, 62};
     private static final byte[][] mBytesIndex = new byte[][]{
@@ -496,6 +496,7 @@ public class SimpleServer {
             }
 
             String[] u = parseURL(status[0]);
+            // Log.d(TAG, "[processRequest] ---> uri = " + u[1]);
             if (u[1].length() == 0/* / */) {
                 if (u[2] == null) {
                     index(socket);
@@ -912,7 +913,7 @@ public class SimpleServer {
     }
 
     private static void d(String message) {
-        Log.e(TAG, message);
+        // Log.e(TAG, message);
     }
 
     private static void e(Exception e) {
@@ -920,7 +921,7 @@ public class SimpleServer {
     }
 
     private static void e(String e) {
-        Log.e(TAG, e);
+        // Log.e(TAG, e);
     }
 
     private static String getDefaultReason(int statusCode) {
