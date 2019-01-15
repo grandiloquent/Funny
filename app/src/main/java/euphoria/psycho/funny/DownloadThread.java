@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 
+import euphoria.psycho.funny.model.DownloadInfo;
 import euphoria.psycho.funny.util.AndroidContext;
 import euphoria.psycho.funny.util.FileUtils;
 

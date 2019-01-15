@@ -6,6 +6,8 @@ import java.text.Collator;
 import java.util.Comparator;
 import java.util.Locale;
 
+import euphoria.psycho.funny.model.FileItem;
+
 
 public class FileItemComparator implements Comparator<FileItem> {
     public static final int SORT_BY_ASCENDING = 0;

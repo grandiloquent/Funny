@@ -47,6 +47,7 @@ import android.telecom.TelecomManager;
 import android.telephony.CarrierConfigManager;
 import android.telephony.TelephonyManager;
 import android.telephony.TelephonyScanManager;
+import android.util.TypedValue;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.CaptioningManager;
@@ -64,6 +65,14 @@ public class AndroidServices {
 
     private AndroidServices(Context context) {
         mContext = context;
+    }
+
+    public float dp2px(float value) {
+        return
+                TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                        value,
+                        mContext.getResources().getDisplayMetrics());
+
     }
 
     public AccessibilityManager provideAccessibilityManager() {

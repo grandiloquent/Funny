@@ -1,9 +1,7 @@
-package euphoria.psycho.funny;
+package euphoria.psycho.funny.model;
 
 import android.util.SparseArray;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class FileItem {

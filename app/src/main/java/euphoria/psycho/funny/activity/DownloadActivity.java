@@ -15,7 +15,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import euphoria.psycho.funny.adapter.DownloadAdapter;
-import euphoria.psycho.funny.DownloadInfo;
+import euphoria.psycho.funny.model.DownloadInfo;
 import euphoria.psycho.funny.DownloadInfoDatabase;
 import euphoria.psycho.funny.R;
 import euphoria.psycho.funny.service.DownloadService;

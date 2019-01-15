@@ -1,12 +1,8 @@
-package euphoria.psycho.funny;
+package euphoria.psycho.funny.activity;
 
 import android.Manifest;
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -19,8 +15,8 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import euphoria.psycho.funny.activity.ServerActivity;
-import euphoria.psycho.funny.util.AndroidServices;
+import euphoria.psycho.funny.fragment.FileFragment;
+import euphoria.psycho.funny.R;
 import euphoria.psycho.funny.util.debug.Log;
 import euphoria.psycho.funny.util.BaseAppCompatActivity;
 

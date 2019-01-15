@@ -28,12 +28,12 @@ import java.util.List;
 import java.util.Locale;
 
 import androidx.annotation.Nullable;
-import euphoria.psycho.funny.MediaItem;
+import euphoria.psycho.funny.model.MediaItem;
 import euphoria.psycho.funny.MediaUtils;
-import euphoria.psycho.funny.NotificationHelper;
+import euphoria.psycho.funny.helper.NotificationHelper;
 import euphoria.psycho.funny.util.AndroidServices;
 
-import static euphoria.psycho.funny.FileFragment.EXTRA_PATH;
+import static euphoria.psycho.funny.fragment.FileFragment.EXTRA_PATH;
 import static euphoria.psycho.funny.util.FileUtils.getDirectoryName;
 import static euphoria.psycho.funny.util.Simple.isEmpty;
 

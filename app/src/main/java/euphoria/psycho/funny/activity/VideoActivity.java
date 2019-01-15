@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.TextureView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.google.android.exoplayer2.C;
@@ -659,6 +660,9 @@ public class VideoActivity extends BaseVideoActivity implements
     @Override
     void initialize() {
         super.initialize();
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         Point point = getNavigationBarSize(this);
         mNavigationBarHeight = point.y;
         mNavigationBarWidth = point.x;
@@ -687,6 +691,16 @@ public class VideoActivity extends BaseVideoActivity implements
         applyTextureViewRotation((TextureView) v, mTextureViewRotation);
     }
 
+    /**
+     * Called when the player starts or stops loading the source.
+     *
+     * @param isLoading Whether the source is currently being loaded.
+     */
+    @Override
+    public void onLoadingChanged(boolean isLoading) {
+
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -704,6 +718,16 @@ public class VideoActivity extends BaseVideoActivity implements
     }
 
     @Override
+    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+
+    }
+
+    @Override
+    public void onPlayerError(ExoPlaybackException error) {
+
+    }
+
+    @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
 //        if (Player.STATE_READY == playbackState) {
 //            seekToLastedState();
@@ -712,43 +736,22 @@ public class VideoActivity extends BaseVideoActivity implements
         updateProgress();
     }
 
-
-    @Override
-    public void onRepeatModeChanged(int repeatMode) {
-
-    }
-
-
-    @Override
-    public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-
-    }
-
-
-    @Override
-    public void onPlayerError(ExoPlaybackException error) {
-
-    }
-
-
     @Override
     public void onPositionDiscontinuity(int reason) {
 
     }
 
-
+    /**
+     * Called when a frame is rendered for the first time since setting the surface, and when a frame
+     * is rendered for the first time since a video track was selected.
+     */
     @Override
-    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+    public void onRenderedFirstFrame() {
 
     }
 
-    /**
-     * Called when all pending seek requests have been processed by the player. This is guaranteed
-     * to happen after any necessary changes to the player state were reported to
-     * {@link #onPlayerStateChanged(boolean, int)}.
-     */
     @Override
-    public void onSeekProcessed() {
+    public void onRepeatModeChanged(int repeatMode) {
 
     }
 
@@ -777,6 +780,21 @@ public class VideoActivity extends BaseVideoActivity implements
         mScrubbing = false;
         seekToTimeBarPosition(position);
         hideController();
+    }
+
+    /**
+     * Called when all pending seek requests have been processed by the player. This is guaranteed
+     * to happen after any necessary changes to the player state were reported to
+     * {@link #onPlayerStateChanged(boolean, int)}.
+     */
+    @Override
+    public void onSeekProcessed() {
+
+    }
+
+    @Override
+    public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+
     }
 
     @Override
@@ -813,17 +831,6 @@ public class VideoActivity extends BaseVideoActivity implements
 
     }
 
-    /**
-     * Called when the player starts or stops loading the source.
-     *
-     * @param isLoading Whether the source is currently being loaded.
-     */
-    @Override
-    public void onLoadingChanged(boolean isLoading) {
-
-    }
-
-
     @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
                                    float pixelWidthHeightRatio) {
@@ -840,14 +847,5 @@ public class VideoActivity extends BaseVideoActivity implements
         }
         applyTextureViewRotation(mTextureView, mTextureViewRotation);
         mExoContentFrame.setAspectRatio(ratio);
-    }
-
-    /**
-     * Called when a frame is rendered for the first time since setting the surface, and when a frame
-     * is rendered for the first time since a video track was selected.
-     */
-    @Override
-    public void onRenderedFirstFrame() {
-
     }
 }

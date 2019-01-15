@@ -1,4 +1,4 @@
-package euphoria.psycho.funny;
+package euphoria.psycho.funny.model;
 
 
 public class DownloadInfo {

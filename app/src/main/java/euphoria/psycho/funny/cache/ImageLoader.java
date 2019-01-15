@@ -1,4 +1,4 @@
-package euphoria.psycho.funny;
+package euphoria.psycho.funny.cache;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,16 +9,19 @@ import android.widget.ImageView;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import euphoria.psycho.funny.model.FileItem;
+import euphoria.psycho.funny.util.AndroidServices;
 import euphoria.psycho.funny.util.BitmapUtils;
 import euphoria.psycho.funny.util.KeyUtils;
 import euphoria.psycho.funny.util.LruCache;
-import euphoria.psycho.funny.util.Simple;
+import euphoria.psycho.funny.util.debug.Log;
 import euphoria.psycho.funny.util.task.ThreadPool;
 
 import static euphoria.psycho.funny.util.FileUtils.closeSilently;
 
 
 public class ImageLoader {
+    private static final String TAG = "Funny/ImageLoader";
     private final CacheService mCacheService;
     private final ThreadPool mThreadPool;
 
@@ -91,7 +94,7 @@ public class ImageLoader {
                     bitmapDrawable.getBitmap().compress(Bitmap.CompressFormat.PNG, 100, outputStream);
                     closeSilently(outputStream);
                 } catch (Exception e) {
-
+                    Log.e(TAG, "[set] ---> ", e);
                 }
             }
             mCache.put(key, bitmapDrawable);
@@ -108,8 +111,7 @@ public class ImageLoader {
             mImageView = imageView;
             mPath = path;
             mKey = key;
-            mSize = Simple.dpToPixel(50);
-
+            mSize = (int) AndroidServices.instance().dp2px(50);
         }
 
         @Override
@@ -118,10 +120,11 @@ public class ImageLoader {
                 if (jc.isCancelled()) return null;
                 Bitmap bitmap;
                 Bitmap sourceBitmap = BitmapUtils.createVideoThumbnail(mPath);
+                if (sourceBitmap == null) return null;
                 bitmap = BitmapUtils.resizeAndCropCenter(sourceBitmap, mSize, true);
                 return new Item().setBitmap(bitmap).setImageView(mImageView).setKey(mKey);
             } catch (Exception e) {
-
+                Log.e(TAG, "[run] ---> " + "mPath = " + mPath, e);
             }
             return null;
         }

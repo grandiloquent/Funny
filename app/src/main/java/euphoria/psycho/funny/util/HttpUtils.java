@@ -17,7 +17,16 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.RequiresPermission;
+import euphoria.psycho.funny.util.debug.Log;
+
 public class HttpUtils {
+    private static final String TAG = "Funny/HttpUtils";
+
+    public static String decodeURL(String url) throws UnsupportedEncodingException {
+        return URLDecoder.decode(url, "UTF-8");
+    }
+
     public static String dumpHeaders(HttpURLConnection conn) {
         StringBuilder sb = new StringBuilder();
         Map<String, List<String>> headers = conn.getHeaderFields();
@@ -33,24 +42,7 @@ public class HttpUtils {
         return sb.toString();
     }
 
-
-    public static String decodeURL(String url) throws UnsupportedEncodingException {
-        return URLDecoder.decode(url, "UTF-8");
-    }
-
-    public static InetAddress intToInetAddress(int hostAddress) {
-        byte[] addressBytes = {(byte) (0xff & hostAddress),
-                (byte) (0xff & (hostAddress >> 8)),
-                (byte) (0xff & (hostAddress >> 16)),
-                (byte) (0xff & (hostAddress >> 24))};
-
-        try {
-            return InetAddress.getByAddress(addressBytes);
-        } catch (UnknownHostException e) {
-            throw new AssertionError();
-        }
-    }
-
+    @RequiresPermission("android.permission.ACCESS_WIFI_STATE")
     public static String getDeviceIP(Context context) {
         WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         try {
@@ -61,6 +53,7 @@ public class HttpUtils {
 
             return inetAddress.getHostAddress();
         } catch (Exception e) {
+            Log.e(TAG, "[getDeviceIP] ---> ", e);
             return null;
         }
     }
@@ -75,6 +68,19 @@ public class HttpUtils {
             url = url.substring(p + 1);
         }
         return url;
+    }
+
+    public static InetAddress intToInetAddress(int hostAddress) {
+        byte[] addressBytes = {(byte) (0xff & hostAddress),
+                (byte) (0xff & (hostAddress >> 8)),
+                (byte) (0xff & (hostAddress >> 16)),
+                (byte) (0xff & (hostAddress >> 24))};
+
+        try {
+            return InetAddress.getByAddress(addressBytes);
+        } catch (UnknownHostException e) {
+            throw new AssertionError();
+        }
     }
 
     public static boolean isValidUrl(String value) {

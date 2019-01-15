@@ -1,4 +1,4 @@
-package euphoria.psycho.funny;
+package euphoria.psycho.funny.model;
 import android.graphics.Bitmap;
 import androidx.annotation.NonNull;
 public class MediaItem {

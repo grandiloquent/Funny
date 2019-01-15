@@ -13,6 +13,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,11 +35,14 @@ import java.util.Map;
 
 import euphoria.psycho.funny.R;
 import euphoria.psycho.funny.service.ServerService;
+import euphoria.psycho.funny.util.AndroidServices;
 import euphoria.psycho.funny.util.BaseAppCompatActivity;
 import euphoria.psycho.funny.util.Simple;
+import euphoria.psycho.funny.util.debug.Log;
 
 public class ServerActivity extends BaseAppCompatActivity {
     private static final int BLACK = 0xFF000000;
+    private static final String TAG = "Funny/ServerActivity";
     private static final int WHITE = 0xFFFFFFFF;
     private final Handler mHandler = new Handler();
     private TextView mAddress;
@@ -45,23 +50,7 @@ public class ServerActivity extends BaseAppCompatActivity {
     boolean mBound = false;
     private ImageView mQrCodeView;
     ServerService mService;
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            ServerService.ServerBinder binder = (ServerService.ServerBinder) service;
-            mService = binder.getService();
-            mBound = true;
-            onStarted(mService.getURL());
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
+    private ServiceConnection mConnection;
     private String mURL;
 
     Bitmap encodeAsBitmap(String contents, BarcodeFormat format, int dimension) throws WriterException {
@@ -101,14 +90,15 @@ public class ServerActivity extends BaseAppCompatActivity {
 
         mHandler.post(() -> {
             try {
-                mBitmap = encodeAsBitmap(url, BarcodeFormat.QR_CODE, Simple.dpToPixel(200));
-                mQrCodeView.setImageDrawable(new BitmapDrawable(mBitmap));
+                mBitmap = encodeAsBitmap(url, BarcodeFormat.QR_CODE, (int) AndroidServices.instance().dp2px(200));
+                if (mQrCodeView != null)
+                    mQrCodeView.setImageDrawable(new BitmapDrawable(mBitmap));
             } catch (WriterException e) {
-                e.printStackTrace();
+                Log.e(TAG, "[onStarted] ---> ", e);
             }
-
-            mAddress.setText("请使用浏览器打开: " + url + "\n" +
-                    "或扫描下方二维码");
+            if (mAddress != null)
+                mAddress.setText("请使用浏览器打开: " + url + "\n" +
+                        "或扫描下方二维码");
         });
     }
 
@@ -182,7 +172,37 @@ public class ServerActivity extends BaseAppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         //new SimpleServer(deviceIp, directories, this, this);
+        final View rootView = getWindow().getDecorView().getRootView();
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
 
+                    @Override
+                    public void onGlobalLayout() {
+
+                        mConnection = new ServiceConnection() {
+
+                            @Override
+                            public void onServiceConnected(ComponentName className,
+                                                           IBinder service) {
+                                // We've bound to LocalService, cast the IBinder and get LocalService instance
+                                ServerService.ServerBinder binder = (ServerService.ServerBinder) service;
+                                mService = binder.getService();
+                                mBound = true;
+
+                                onStarted(mService.getURL());
+                            }
+
+                            @Override
+                            public void onServiceDisconnected(ComponentName arg0) {
+                                mBound = false;
+                            }
+                        };
+                        Intent intent = new Intent(ServerActivity.this, ServerService.class);
+                        startService(intent);
+                        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
+                    }
+                });
 
     }
 
@@ -202,11 +222,15 @@ public class ServerActivity extends BaseAppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
-        Intent intent = new Intent(this, ServerService.class);
-        startService(intent);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
     }
 
     @Override

@@ -1,4 +1,4 @@
-package euphoria.psycho.funny;
+package euphoria.psycho.funny.util;
 import android.util.SparseBooleanArray;
 import java.util.ArrayList;
 import androidx.recyclerview.widget.RecyclerView;

@@ -11,7 +11,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.NonNull;
+import euphoria.psycho.funny.model.DownloadInfo;
 
 
 public class DownloadInfoDatabase extends SQLiteOpenHelper {

@@ -1,4 +1,4 @@
-package euphoria.psycho.funny;
+package euphoria.psycho.funny.helper;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
+import euphoria.psycho.funny.R;
 import euphoria.psycho.funny.service.MusicService;
 import euphoria.psycho.funny.util.AndroidServices;
 import euphoria.psycho.funny.util.debug.Log;

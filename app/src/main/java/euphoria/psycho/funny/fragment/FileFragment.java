@@ -1,4 +1,4 @@
-package euphoria.psycho.funny;
+package euphoria.psycho.funny.fragment;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -50,8 +50,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import euphoria.psycho.funny.R;
+import euphoria.psycho.funny.activity.MainActivity;
 import euphoria.psycho.funny.activity.VideoActivity;
 import euphoria.psycho.funny.adapter.FileAdapter;
+import euphoria.psycho.funny.model.FileItem;
 import euphoria.psycho.funny.service.MusicService;
 import euphoria.psycho.funny.ui.SwipeLayout;
 import euphoria.psycho.funny.util.AndroidContext;
@@ -513,6 +516,7 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
     public void onItemCheckedChanged(FileItem fileItem, boolean selected) {
 
     }
+
 
     @Override
     public void onItemClicked(int position, FileItem fileItem) {
