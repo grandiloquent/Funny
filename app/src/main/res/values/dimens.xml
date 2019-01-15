@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="notification_action_height">48.0dip</dimen>
+    <dimen name="notification_action_padding">8.0dip</dimen>
+    <dimen name="notification_action_width">48.0dip</dimen>
+    <dimen name="notification_big_icon_height">64.0dip</dimen>
+    <dimen name="notification_big_icon_width">64.0dip</dimen>
+    <dimen name="notification_info_container_padding_bottom">4.0dip</dimen>
+    <dimen name="notification_info_container_padding_left">8.0dip</dimen>
+</resources>

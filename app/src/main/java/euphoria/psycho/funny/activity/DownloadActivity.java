@@ -1,4 +1,4 @@
-package euphoria.psycho.funny;
+package euphoria.psycho.funny.activity;
 
 
 import android.Manifest;
@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -15,6 +14,11 @@ import java.util.List;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import euphoria.psycho.funny.adapter.DownloadAdapter;
+import euphoria.psycho.funny.DownloadInfo;
+import euphoria.psycho.funny.DownloadInfoDatabase;
+import euphoria.psycho.funny.R;
+import euphoria.psycho.funny.service.DownloadService;
 import euphoria.psycho.funny.util.BaseAppCompatActivity;
 
 public class DownloadActivity extends BaseAppCompatActivity implements DownloadAdapter.MenuListener {

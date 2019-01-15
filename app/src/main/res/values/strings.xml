@@ -1,51 +1,19 @@
 <resources>
-    <dimen name="notification_action_height">48.0dip</dimen>
-    <dimen name="notification_action_padding">8.0dip</dimen>
-    <dimen name="notification_action_width">48.0dip</dimen>
-    <dimen name="notification_big_icon_height">64.0dip</dimen>
-    <dimen name="notification_big_icon_width">64.0dip</dimen>
-    <dimen name="notification_info_container_padding_bottom">4.0dip</dimen>
-    <dimen name="notification_info_container_padding_left">8.0dip</dimen>
+
     <string name="accessibility_next">Next</string>
     <string name="accessibility_play">Play</string>
     <string name="accessibility_prev">Previous</string>
     <string name="app_name">Funny</string>
     <string name="drawer_close">打开</string>
     <string name="drawer_open">打开</string>
+    <string name="menu_convert_to_utf8">UTF8</string>
+    <string name="menu_copy_name">复制文件名</string>
+    <string name="menu_delete">删除</string>
+    <string name="menu_property">属性</string>
+    <string name="menu_rename">重命名</string>
     <string name="menu_sdcard">SDCard</string>
+    <string name="menu_search_subtitle">搜索字幕</string>
     <string name="menu_storage">Storage</string>
     <string name="message_subtitle_not_found">未搜索到相关字幕</string>
 
-    <style name="NotificationAction">
-        <item name="android:layout_width">@dimen/notification_action_width</item>
-        <item name="android:layout_height">@dimen/notification_action_height</item>
-        <item name="android:gravity">center|right</item>
-        <item name="android:scaleType">fitCenter</item>
-        <item name="android:padding">@dimen/notification_action_padding</item>
-        <item name="android:background">?android:selectableItemBackground</item>
-    </style>
-
-    <style name="NotificationAction.Next" parent="@style/NotificationAction">
-        <item name="android:src">@drawable/btn_playback_next</item>
-        <item name="android:contentDescription">@string/accessibility_next</item>
-    </style>
-
-    <style name="NotificationAction.Play" parent="@style/NotificationAction">
-        <item name="android:src">@drawable/btn_playback_play</item>
-        <item name="android:contentDescription">@string/accessibility_play</item>
-    </style>
-
-    <style name="NotificationAction.Previous" parent="@style/NotificationAction">
-        <item name="android:src">@drawable/btn_playback_previous</item>
-        <item name="android:visibility">gone</item>
-        <item name="android:contentDescription">@string/accessibility_prev</item>
-    </style>
-
-    <style name="NotificationText">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:ellipsize">end</item>
-        <item name="android:fadingEdge">horizontal</item>
-        <item name="android:singleLine">true</item>
-    </style>
 </resources>

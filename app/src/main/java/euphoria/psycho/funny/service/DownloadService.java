@@ -1,4 +1,4 @@
-package euphoria.psycho.funny;
+package euphoria.psycho.funny.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -28,6 +28,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
+import euphoria.psycho.funny.activity.DownloadActivity;
+import euphoria.psycho.funny.DownloadInfo;
+import euphoria.psycho.funny.DownloadInfoDatabase;
+import euphoria.psycho.funny.DownloadThread;
 import euphoria.psycho.funny.util.BaseService;
 import euphoria.psycho.funny.util.FileUtils;
 import euphoria.psycho.funny.util.HttpUtils;

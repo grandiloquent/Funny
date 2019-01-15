@@ -51,6 +51,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import euphoria.psycho.funny.activity.VideoActivity;
+import euphoria.psycho.funny.adapter.FileAdapter;
 import euphoria.psycho.funny.service.MusicService;
 import euphoria.psycho.funny.ui.SwipeLayout;
 import euphoria.psycho.funny.util.AndroidContext;

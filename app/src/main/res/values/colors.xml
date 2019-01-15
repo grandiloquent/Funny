@@ -3,4 +3,8 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="rippleColorLight">@color/md_black_1000_12</color>
+    <color name="md_black_1000_12">#1F000000</color>
+    <color name="md_white_1000">#FFFFFFFF</color>
+    <color name="dialogLight">@color/md_white_1000</color>
 </resources>

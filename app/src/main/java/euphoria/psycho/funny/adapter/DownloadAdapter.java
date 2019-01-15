@@ -1,4 +1,4 @@
-package euphoria.psycho.funny;
+package euphoria.psycho.funny.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +11,9 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import euphoria.psycho.download.persistence.DownloadInfo;
-import euphoria.psycho.player.R;
-import euphoria.psycho.utils.FileUtils;
+import euphoria.psycho.funny.DownloadInfo;
+import euphoria.psycho.funny.R;
+import euphoria.psycho.funny.util.FileUtils;
 
 public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHolder> {
     private final List<DownloadInfo> mDownloadInfos = new ArrayList<>();
@@ -51,7 +51,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
         return new ViewHolder(view);
     }
 
-    interface MenuListener {
+    public interface MenuListener {
         void onClicked(View view, DownloadInfo info);
     }
 
