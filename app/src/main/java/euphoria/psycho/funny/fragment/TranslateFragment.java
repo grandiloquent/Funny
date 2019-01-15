@@ -101,7 +101,7 @@ public class TranslateFragment extends Fragment {
                     .build().newCall(request).execute();
             if (response.isSuccessful()) {
                 try {
-                    return parseJSON(request.toString());
+                    return parseJSON(response.toString());
                 } catch (JSONException e) {
                     Log.e(TAG,"[query] ---> ",e);
                     return null;
