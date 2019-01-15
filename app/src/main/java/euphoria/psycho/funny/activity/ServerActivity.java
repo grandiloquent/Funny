@@ -200,6 +200,7 @@ public class ServerActivity extends BaseAppCompatActivity {
                         Intent intent = new Intent(ServerActivity.this, ServerService.class);
                         startService(intent);
                         if (!mBound)
+                            //android.app.ServiceConnectionLeaked: Activity euphoria.psycho.funny.activity.ServerActivity has leaked ServiceConnection
                             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
                     }
@@ -238,8 +239,12 @@ public class ServerActivity extends BaseAppCompatActivity {
     protected void onStop() {
         super.onStop();
         if (mBound) {
+            try{
             unbindService(mConnection);
             mBound = false;
+        }catch (Exception e){
+                Log.e(TAG,"[onStop] ---> ",e);
+            }
         }
     }
 }

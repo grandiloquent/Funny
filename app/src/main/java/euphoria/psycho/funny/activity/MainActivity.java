@@ -19,6 +19,7 @@ import euphoria.psycho.funny.fragment.DownloadFragment;
 import euphoria.psycho.funny.fragment.FileFragment;
 import euphoria.psycho.funny.R;
 import euphoria.psycho.funny.fragment.HiddenCameraFragment;
+import euphoria.psycho.funny.fragment.TranslateFragment;
 import euphoria.psycho.funny.util.AndroidServices;
 import euphoria.psycho.funny.util.debug.Log;
 import euphoria.psycho.funny.util.BaseAppCompatActivity;
@@ -46,13 +47,23 @@ public class MainActivity extends BaseAppCompatActivity {
                 fragmentClass = FileFragment.class;
                 break;
             }
+            case R.id.action_download: {
+                fragmentClass = DownloadFragment.class;
+                break;
+            }
+            case R.id.action_translate: {
+                fragmentClass = TranslateFragment.class;
+                break;
+            }
             case R.id.action_hidden_camera:
                 AndroidServices.instance().requestOverlayPermission();
                 break;
             case R.id.action_server:
                 Intent intent = new Intent(this, ServerActivity.class);
                 startActivity(intent);
+                mDrawer.closeDrawers();
                 return true;
+
         }
         if (fragmentClass != null) {
             try {
