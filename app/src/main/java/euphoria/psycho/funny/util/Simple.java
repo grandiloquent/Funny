@@ -37,12 +37,45 @@ public class Simple {
         return value;
     }
 
+    public static <T> List<T> distinct(List<T> source) {
+        List<T> r = new ArrayList<>();
+        int length = source.size();
+        for (int i = 0; i < length; i++) {
+
+            while (i + 1 < length && source.get(i).equals(source.get(i + 1))) {
+                i++;
+            }
+            r.add(source.get(i));
+        }
+        return r;
+    }
+
     public static float dpToPixel(float dp) {
         return sPixelDensity * dp;
     }
 
     public static int dpToPixel(int dp) {
         return Math.round(dpToPixel((float) dp));
+    }
+
+    public static boolean endWiths(String value, String suffix, boolean ignoreCase) {
+        int s = suffix.length();
+        int v = value.length();
+        if (v < s) return false;
+        int i = 0;
+        while (--s >= 0) {
+            if (ignoreCase) {
+                i++;
+                int a = value.charAt(v - i);
+                int b = suffix.charAt(s);
+                a |= 0x20;
+                b |= 0x20;
+                if (a != b) return false;
+            } else {
+                if (value.charAt(v - s) != suffix.charAt(s)) return false;
+            }
+        }
+        return true;
     }
 
     public static String getSelectedText(EditText editText) {
@@ -55,6 +88,11 @@ public class Simple {
             return s.substring(editText.getSelectionStart(), editText.getSelectionEnd());
 
         return null;
+    }
+
+    public static String getString(CharSequence charSequence) {
+        if (charSequence == null) return "";
+        return charSequence.toString();
     }
 
     public static void initialize(Context context) {
@@ -78,6 +116,16 @@ public class Simple {
         int length = charSequence.length();
         for (int i = 0; i < length; i++) {
             if (!Character.isWhitespace(charSequence.charAt(i))) return false;
+        }
+        return true;
+    }
+
+    public static boolean isNullOrWhiteSpace(String value) {
+        if (value == null) return true;
+        int len = value.length();
+
+        for (int i = 0; i < len; i++) {
+            if (!Character.isWhitespace(value.charAt(i))) return false;
         }
         return true;
     }
@@ -216,24 +264,9 @@ public class Simple {
 
     }
 
-    public static boolean endWiths(String value, String suffix, boolean ignoreCase) {
-        int s = suffix.length();
-        int v = value.length();
-        if (v < s) return false;
-        int i = 0;
-        while (--s >= 0) {
-            if (ignoreCase) {
-                i++;
-                int a = value.charAt(v - i);
-                int b = suffix.charAt(s);
-                a |= 0x20;
-                b |= 0x20;
-                if (a != b) return false;
-            } else {
-                if (value.charAt(v - s) != suffix.charAt(s)) return false;
-            }
-        }
-        return true;
+    public static void setClipboardText(Context context, String s) {
+        ClipboardManager manager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        manager.setPrimaryClip(ClipData.newPlainText("", s));
     }
 
     public static String sort(String s, Comparator<String> comparator) {
@@ -248,6 +281,22 @@ public class Simple {
         }
         Collections.sort(sortLines, comparator);
         return joining(sortLines, "\n");
+    }
+
+    public static String sort(String value) {
+        String[] lines = value.split("\n");
+        List<String> list = new ArrayList<>();
+        for (String l : lines) {
+            list.add(l.trim());
+        }
+        Collections.sort(list, String::compareToIgnoreCase);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String l : list) {
+            stringBuilder.append(l).append('\n');
+        }
+        return stringBuilder.toString();
+
     }
 
     public static String substringBefore(String value, String delimiter) {
@@ -276,38 +325,6 @@ public class Simple {
         if (index == -1)
             return null;
         return value.substring(0, index);
-    }
-
-    public static String sort(String value) {
-        String[] lines = value.split("\n");
-        List<String> list = new ArrayList<>();
-        for (String l : lines) {
-            list.add(l.trim());
-        }
-        Collections.sort(list, String::compareToIgnoreCase);
-
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String l : list) {
-            stringBuilder.append(l).append('\n');
-        }
-        return stringBuilder.toString();
-
-    }
-    public static <T> List<T> distinct(List<T> source) {
-        List<T> r = new ArrayList<>();
-        int length = source.size();
-        for (int i = 0; i < length; i++) {
-
-            while (i + 1 < length && source.get(i).equals(source.get(i + 1))) {
-                i++;
-            }
-            r.add(source.get(i));
-        }
-        return r;
-    }
-    public static void setClipboardText(Context context, String s) {
-        ClipboardManager manager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-        manager.setPrimaryClip(ClipData.newPlainText("", s));
     }
 
     public static void toast(Fragment fragment, String message, boolean showLong) {

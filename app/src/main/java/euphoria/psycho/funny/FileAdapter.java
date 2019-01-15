@@ -125,6 +125,7 @@ public class FileAdapter extends SelectableAdapter<FileAdapter.ViewHolder> imple
         holder.description.setText(fileItem.getDescription());
         Drawable drawable = mCache.get(fileItem.getType());
         if (drawable == null) {
+            holder.musicCover.setImageDrawable(null);
             mImageLoader.load(fileItem, holder.musicCover);
         } else {
             holder.musicCover.setImageDrawable(drawable);
