@@ -1,5 +1,6 @@
 package euphoria.psycho.funny.util;
 
+import android.Manifest;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
@@ -18,8 +19,10 @@ import android.bluetooth.BluetoothManager;
 import android.companion.CompanionDeviceManager;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.RestrictionsManager;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.hardware.ConsumerIrManager;
 import android.hardware.camera2.CameraManager;
@@ -43,6 +46,7 @@ import android.os.UserManager;
 import android.os.health.SystemHealthManager;
 import android.os.storage.StorageManager;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.telecom.TelecomManager;
 import android.telephony.CarrierConfigManager;
 import android.telephony.TelephonyManager;
@@ -406,6 +410,16 @@ public class AndroidServices {
         } else {
             return (WifiP2pManager) mContext.getSystemService(Context.WIFI_P2P_SERVICE);
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public void requestOverlayPermission() {
+        if (mContext.checkSelfPermission(Manifest.permission.SYSTEM_ALERT_WINDOW) == PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(intent);
     }
 
     @TargetApi(Build.VERSION_CODES.P)

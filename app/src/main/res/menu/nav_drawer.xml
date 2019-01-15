@@ -3,12 +3,18 @@
     <group android:id="@+id/primary">
         <item
             android:id="@+id/action_fragment_file"
-            android:title="文件" />
+            android:icon="@drawable/ic_video_library_black_24dp"
+            android:title="@string/menu_fragment_file" />
         <item
-            android:id="@+id/action_hidden_camera"
-            android:title="其他" />
+            android:id="@+id/action_download"
+            android:icon="@drawable/ic_file_download_black_24dp"
+            android:title="@string/menu_download" />
         <item
             android:id="@+id/action_server"
-            android:title="服务器" />
+            android:icon="@drawable/ic_send_black_24dp"
+            android:title="@string/menu_server" />
+        <item
+            android:id="@+id/action_hidden_camera"
+            android:title="@string/menu_hidden_camera" />
     </group>
 </menu>

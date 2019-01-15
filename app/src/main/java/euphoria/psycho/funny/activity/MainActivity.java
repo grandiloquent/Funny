@@ -17,6 +17,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import euphoria.psycho.funny.fragment.FileFragment;
 import euphoria.psycho.funny.R;
+import euphoria.psycho.funny.fragment.HiddenCameraFragment;
+import euphoria.psycho.funny.util.AndroidServices;
 import euphoria.psycho.funny.util.debug.Log;
 import euphoria.psycho.funny.util.BaseAppCompatActivity;
 
@@ -44,6 +46,7 @@ public class MainActivity extends BaseAppCompatActivity {
                 break;
             }
             case R.id.action_hidden_camera:
+                AndroidServices.instance().requestOverlayPermission();
                 break;
             case R.id.action_server:
                 Intent intent = new Intent(this, ServerActivity.class);
@@ -114,7 +117,7 @@ public class MainActivity extends BaseAppCompatActivity {
         super.initialize();
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.content, new FileFragment())
+                .replace(R.id.content, new HiddenCameraFragment())
                 .commit();
 
 

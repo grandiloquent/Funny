@@ -15,5 +15,8 @@
     <string name="menu_search_subtitle">搜索字幕</string>
     <string name="menu_storage">Storage</string>
     <string name="message_subtitle_not_found">未搜索到相关字幕</string>
-
+    <string name="menu_fragment_file">文件</string>
+    <string name="menu_hidden_camera">其他</string>
+    <string name="menu_server">服务器</string>
+    <string name="menu_download">下载</string>
 </resources>

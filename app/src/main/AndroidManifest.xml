@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:name=".util.App"
@@ -80,5 +81,6 @@
         <service android:name=".service.MusicService" />
         <service android:name=".service.ServerService" />
         <service android:name=".service.DownloadService" />
+        <service android:name=".service.HiddenCameraService" />
     </application>
 </manifest>
