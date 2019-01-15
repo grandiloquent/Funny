@@ -15,6 +15,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import euphoria.psycho.funny.fragment.DownloadFragment;
 import euphoria.psycho.funny.fragment.FileFragment;
 import euphoria.psycho.funny.R;
 import euphoria.psycho.funny.fragment.HiddenCameraFragment;
@@ -117,7 +118,7 @@ public class MainActivity extends BaseAppCompatActivity {
         super.initialize();
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.content, new HiddenCameraFragment())
+                .replace(R.id.content, new DownloadFragment())
                 .commit();
 
 

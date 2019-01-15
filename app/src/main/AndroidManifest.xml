@@ -11,7 +11,7 @@
 
     <application
         android:name=".util.App"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:noHistory="true"
         android:theme="@style/AppTheme">
@@ -76,7 +76,6 @@
         <activity
             android:name=".activity.ServerActivity"
             android:launchMode="singleInstance" />
-        <activity android:name=".activity.DownloadActivity" />
 
         <service android:name=".service.MusicService" />
         <service android:name=".service.ServerService" />

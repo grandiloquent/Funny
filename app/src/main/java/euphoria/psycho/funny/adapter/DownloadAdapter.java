@@ -14,8 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import euphoria.psycho.funny.model.DownloadInfo;
 import euphoria.psycho.funny.R;
 import euphoria.psycho.funny.util.FileUtils;
+import euphoria.psycho.funny.util.debug.Log;
 
 public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHolder> {
+    private static final String TAG = "Funny/DownloadAdapter";
     private final List<DownloadInfo> mDownloadInfos = new ArrayList<>();
     private final MenuListener mMenuListener;
 
@@ -24,12 +26,14 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
     }
 
     public void addAll(List<DownloadInfo> downloadInfos) {
+        // Log.d(TAG, "[addAll] ---> size = " + downloadInfos.size());
         mDownloadInfos.clear();
         mDownloadInfos.addAll(downloadInfos);
         notifyDataSetChanged();
     }
 
     public int getItemCount() {
+        // Log.d(TAG, "[getItemCount] ---> size = " + mDownloadInfos.size());
         return mDownloadInfos.size();
     }
 

@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 import android.util.LongSparseArray;
 import android.widget.Toast;
 
@@ -28,7 +27,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
-import euphoria.psycho.funny.activity.DownloadActivity;
+import euphoria.psycho.funny.fragment.DownloadFragment;
 import euphoria.psycho.funny.model.DownloadInfo;
 import euphoria.psycho.funny.DownloadInfoDatabase;
 import euphoria.psycho.funny.DownloadThread;
@@ -36,6 +35,7 @@ import euphoria.psycho.funny.util.BaseService;
 import euphoria.psycho.funny.util.FileUtils;
 import euphoria.psycho.funny.util.HttpUtils;
 import euphoria.psycho.funny.util.Simple;
+import euphoria.psycho.funny.util.debug.Log;
 import euphoria.psycho.funny.util.task.PriorityThreadFactory;
 
 public class DownloadService extends BaseService implements DownloadInfo.Listener {
@@ -48,7 +48,7 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
     private static final String DEFAULT_DIRECTORY_NAME = "Videos";
     private static final int KEEP_ALIVE_TIME = 10; // 10 seconds
     private static final int MAX_POOL_SIZE = 8;
-    private static final String TAG = "_tag_";
+    private static final String TAG = "Funny/DownloadService";
     private final Handler mHandler = new Handler();
     private final StringBuilder mStringBuilder = new StringBuilder();
     private ClipboardManager mClipboardManager;
@@ -60,7 +60,6 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
     private final ClipboardManager.OnPrimaryClipChangedListener mOnPrimaryClipChangedListener = this::clipboardTask;
 
     private void clipboardTask() {
-        Log.e(TAG, "===> [clipboardTask]");
 
         ClipData clipData = mClipboardManager.getPrimaryClip();
 
@@ -103,7 +102,6 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
     }
 
     private int indexOfTask(DownloadThread thread) {
-        Log.e(TAG, "===> [indexOfTask]");
 
         if (mTasks.size() == 0) return -1;
         for (int i = 0; i < mTasks.size(); i++) {
@@ -114,7 +112,6 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
     }
 
     private void makeNotification(long id, long speed, String message) {
-        Log.e(TAG, "===> [makeNotification]");
 
         DownloadInfo info = mMap.get(id);
         String tag = "tag" + Long.toString(id);
@@ -129,6 +126,7 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
             builder = new Notification.Builder(this);
         }
         builder.setSmallIcon(android.R.drawable.stat_sys_download_done);
+        builder.setOngoing(true);
         if (message != null) {
             builder.setContentTitle(FileUtils.getFileName(info.fileName));
             builder.setContentText(message);
@@ -152,7 +150,6 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
     }
 
     private synchronized void removeTask(long id) {
-        Log.e(TAG, "===> [removeTask]");
 
         mMap.remove(id);
 
@@ -167,7 +164,6 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
     }
 
     private void setUpDirectory() {
-        Log.e(TAG, "===> [setUpDirectory]");
 
 
         File dir = new File(Environment.getExternalStorageDirectory(), DEFAULT_DIRECTORY_NAME);
@@ -181,7 +177,6 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
 
 
     private void setupClipboard() {
-        Log.e(TAG, "===> [setupClipboard]");
 
         mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         assert mClipboardManager != null;
@@ -190,7 +185,6 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
 
 
     private void setupExecutor() {
-        Log.e(TAG, "===> [setupExecutor]");
 
         mExecutorService = new ThreadPoolExecutor(
                 CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME,
@@ -201,11 +195,11 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
 
 
     private void startTask(long id) {
-        Log.e(TAG, "===> [startTask]");
-
+        Log.d(TAG, "[startTask] ---> id = " + id);
         DownloadInfo downloadInfo = DownloadInfoDatabase.getInstance(this).getDownloadInfo(id);
 
         if (downloadInfo == null) {
+            // Log.e(TAG, "[startTask] ---> cant find the task in the database. id = " + id);
             return;
         }
 
@@ -253,20 +247,18 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
 
 
     private void submitTask(long id, DownloadInfo downloadInfo) {
-        Log.e(TAG, "===> [submitTask]");
 
         if (id < 0) return;
         downloadInfo.listener = this;
         downloadInfo.id = id;
         submitTask(downloadInfo);
-        Intent intent = new Intent(DownloadActivity.ACTION_UPDATE);
+        Intent intent = new Intent(DownloadFragment.ACTION_UPDATE);
         sendBroadcast(intent);
         Toast.makeText(this, " 从剪切板添加任务: " + id, Toast.LENGTH_LONG).show();
     }
 
 
     private void submitTask(DownloadInfo info) {
-        Log.e(TAG, "===> [submitTask]");
 
         DownloadThread thread = new DownloadThread(info, this);
         if (indexOfTask(thread) != -1) {
@@ -280,7 +272,6 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
 
 
     private static long getRemainingMillis(long total, long current, long speed) {
-        Log.e(TAG, "===> [getRemainingMillis]");
 
         return ((total - current) * 1000) / speed;
     }
@@ -288,7 +279,7 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
 
     @Override
     public void notifySpeed(long id, long speed) {
-        Log.e(TAG, "===> [notifySpeed]");
+
 
         mHandler.post(() -> {
             makeNotification(id, speed, null);
@@ -299,7 +290,7 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        Log.e(TAG, "===> [onBind]");
+
 
         return null;
     }
@@ -307,7 +298,6 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
 
     @Override
     public void onCreate() {
-        Log.e(TAG, "===> [onCreate]");
 
         super.onCreate();
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -321,7 +311,6 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
 
     @Override
     public void onDestroy() {
-        Log.e(TAG, "===> [onDestroy]");
 
 
         mClipboardManager.removePrimaryClipChangedListener(mOnPrimaryClipChangedListener);
@@ -331,7 +320,6 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
 
     @Override
     public void onError(long id, String message) {
-        Log.e(TAG, "===> [onError]");
 
         mHandler.post(() -> {
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
@@ -344,7 +332,6 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
 
     @Override
     public void onFinished(long id) {
-        Log.e(TAG, "===> [onFinished]");
 
         mHandler.post(() -> {
             removeTask(id);
@@ -354,7 +341,6 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e(TAG, "===> [onStartCommand]");
 
 
         int command = intent.getIntExtra(EXTRA_COMMAND, -1);
@@ -372,13 +358,12 @@ public class DownloadService extends BaseService implements DownloadInfo.Listene
         }
         //setupNotification();
 
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
 
     @Override
     public void onStatusChanged(long id, String message) {
-        Log.e(TAG, "===> [onStatusChanged]");
 
         mHandler.post(() -> {
             makeNotification(id, 0L, message);

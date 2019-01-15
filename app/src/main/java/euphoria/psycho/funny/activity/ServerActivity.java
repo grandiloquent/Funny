@@ -199,7 +199,8 @@ public class ServerActivity extends BaseAppCompatActivity {
                         };
                         Intent intent = new Intent(ServerActivity.this, ServerService.class);
                         startService(intent);
-                        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+                        if (!mBound)
+                            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
                     }
                 });

@@ -166,6 +166,7 @@ public class DownloadInfoDatabase extends SQLiteOpenHelper {
         // String sql = "INSERT OR IGNORE INTO `downloadInfos`(`currentBytes`,`fileName`,`finished`,`_id`,`message`,`status`,`totalBytes`,`url`) VALUES (?,?,?,nullif(?, 0),?,?,?,?)";
 
         try {
+            db.beginTransaction();
             ContentValues values = new ContentValues();
             values.put("currentBytes", downloadInfo.currentBytes);
             values.put("fileName", downloadInfo.fileName);
@@ -175,7 +176,7 @@ public class DownloadInfoDatabase extends SQLiteOpenHelper {
             values.put("totalBytes", downloadInfo.totalBytes);
             values.put("url", downloadInfo.url);
 
-            long _result = db.insert("downloadInfos", null, values);
+            long _result = db.insertWithOnConflict("downloadInfos", null, values, SQLiteDatabase.CONFLICT_IGNORE);
             db.setTransactionSuccessful();
             return _result;
         } finally {

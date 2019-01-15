@@ -1,5 +1,9 @@
 package euphoria.psycho.funny.fragment;
 
+import android.Manifest;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,11 +18,13 @@ import euphoria.psycho.funny.R;
 public class HiddenCameraFragment extends Fragment {
     private Button mButtonTakePicture;
 
+
     private void setButton() {
         mButtonTakePicture.setOnClickListener(v -> {
 
         });
     }
+
 
     @Nullable
     @Override
