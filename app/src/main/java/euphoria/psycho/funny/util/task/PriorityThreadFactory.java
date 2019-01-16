@@ -1,5 +1,7 @@
 package euphoria.psycho.funny.util.task;
+
 import android.os.Process;
+
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 /**

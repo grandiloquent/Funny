@@ -1,4 +1,5 @@
 package euphoria.psycho.funny.ui;
+
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -12,9 +13,8 @@ import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
 import android.widget.AbsListView;
-import android.widget.ListView;
+
 import androidx.core.view.ViewCompat;
-import androidx.core.widget.ListViewCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class SwipeLayout extends ViewGroup {

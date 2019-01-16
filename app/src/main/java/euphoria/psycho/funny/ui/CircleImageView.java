@@ -1,4 +1,5 @@
 package euphoria.psycho.funny.ui;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,6 +11,7 @@ import android.graphics.drawable.shapes.OvalShape;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.ImageView;
+
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 /**

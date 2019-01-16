@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import euphoria.psycho.funny.util.debug.Log;
 import euphoria.psycho.funny.util.Simple;
+import euphoria.psycho.funny.util.debug.Log;
 
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private static final String TAG = "CameraPreview";

@@ -1,6 +1,8 @@
 package euphoria.psycho.funny;
+
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+
 import java.io.File;
 
 import euphoria.psycho.funny.model.MediaItem;

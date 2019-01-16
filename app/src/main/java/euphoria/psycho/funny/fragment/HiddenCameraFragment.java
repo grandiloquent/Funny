@@ -1,9 +1,5 @@
 package euphoria.psycho.funny.fragment;
 
-import android.Manifest;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;

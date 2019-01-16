@@ -20,9 +20,9 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import euphoria.psycho.funny.model.FileItem;
-import euphoria.psycho.funny.cache.ImageLoader;
 import euphoria.psycho.funny.R;
+import euphoria.psycho.funny.cache.ImageLoader;
+import euphoria.psycho.funny.model.FileItem;
 import euphoria.psycho.funny.util.SelectableAdapter;
 
 public class FileAdapter extends SelectableAdapter<FileAdapter.ViewHolder> implements LifecycleObserver {
@@ -39,7 +39,9 @@ public class FileAdapter extends SelectableAdapter<FileAdapter.ViewHolder> imple
     public FileAdapter(Context context,
                        Callback callback,
                        Lifecycle lifecycle) {
-        setHasStableIds(true);
+        // setHasStableIds(true);
+
+        // java.lang.IndexOutOfBoundsException: Inconsistency detected. Invalid item position 0(offset:-1
         mContext = context;
         Resources resources = context.getResources();
         mImageLoader = new ImageLoader();

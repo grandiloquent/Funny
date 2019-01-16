@@ -1,10 +1,13 @@
 package euphoria.psycho.funny.ui;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
 import androidx.annotation.IntDef;
 import euphoria.psycho.funny.R;
 

@@ -1,7 +1,5 @@
 package euphoria.psycho.funny.ui;
 
-import static androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP;
-
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -21,15 +19,15 @@ import android.util.DisplayMetrics;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.RestrictTo;
-import androidx.core.util.Preconditions;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
-import euphoria.psycho.funny.util.Simple;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import static androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 
 /**
  * Drawable that renders the animated indeterminate progress indicator in the Material design style

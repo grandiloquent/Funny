@@ -3,7 +3,6 @@ package euphoria.psycho.funny.util;
 import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.text.format.Formatter;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -14,8 +13,6 @@ import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import androidx.annotation.RequiresPermission;
 import euphoria.psycho.funny.util.debug.Log;

@@ -1,6 +1,9 @@
 package euphoria.psycho.funny.util;
+
 import android.util.SparseBooleanArray;
+
 import java.util.ArrayList;
+
 import androidx.recyclerview.widget.RecyclerView;
 /*
  * The base class for adapters with the ability to select items.

@@ -1,11 +1,14 @@
 package euphoria.psycho.funny.cache;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+
 import euphoria.psycho.funny.util.BlobCache;
 
 public class CacheManager {

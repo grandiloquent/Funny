@@ -11,10 +11,8 @@ import android.app.KeyguardManager;
 import android.app.NotificationManager;
 import android.app.SearchManager;
 import android.app.WallpaperManager;
-import android.app.backup.BackupManager;
 import android.app.usage.NetworkStatsManager;
 import android.app.usage.StorageStatsManager;
-import android.appwidget.AppWidgetManager;
 import android.bluetooth.BluetoothManager;
 import android.companion.CompanionDeviceManager;
 import android.content.ClipboardManager;
@@ -23,7 +21,6 @@ import android.content.Intent;
 import android.content.RestrictionsManager;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.hardware.ConsumerIrManager;
 import android.hardware.camera2.CameraManager;
 import android.hardware.input.InputManager;
@@ -55,14 +52,8 @@ import android.util.TypedValue;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.CaptioningManager;
-import android.view.autofill.AutofillManager;
 import android.view.inputmethod.InputMethodManager;
 import android.view.textclassifier.TextClassificationManager;
-
-import java.sql.DriverManager;
-
-import androidx.appcompat.widget.AppCompatDrawableManager;
-import androidx.recyclerview.widget.GridLayoutManager;
 
 public class AndroidServices {
     private final Context mContext;

@@ -13,7 +13,6 @@ import android.os.IBinder;
 import android.util.LongSparseArray;
 import android.widget.Toast;
 
-
 import com.google.android.exoplayer2.util.Util;
 
 import java.io.File;
@@ -27,10 +26,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
-import euphoria.psycho.funny.fragment.DownloadFragment;
-import euphoria.psycho.funny.model.DownloadInfo;
 import euphoria.psycho.funny.DownloadInfoDatabase;
 import euphoria.psycho.funny.DownloadThread;
+import euphoria.psycho.funny.fragment.DownloadFragment;
+import euphoria.psycho.funny.model.DownloadInfo;
 import euphoria.psycho.funny.util.BaseService;
 import euphoria.psycho.funny.util.FileUtils;
 import euphoria.psycho.funny.util.HttpUtils;

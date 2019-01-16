@@ -57,14 +57,14 @@ import java.util.regex.Pattern;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.documentfile.provider.DocumentFile;
-import euphoria.psycho.funny.util.FileUtils;
 import euphoria.psycho.funny.R;
 import euphoria.psycho.funny.cache.Bookmarker;
 import euphoria.psycho.funny.helper.VideoTouchHelper;
 import euphoria.psycho.funny.ui.TimeBar;
+import euphoria.psycho.funny.util.FileUtils;
 
-import static com.google.android.exoplayer2.C.TIME_END_OF_SOURCE;
 import static com.google.android.exoplayer2.C.INDEX_UNSET;
+import static com.google.android.exoplayer2.C.TIME_END_OF_SOURCE;
 import static com.google.android.exoplayer2.C.TIME_UNSET;
 import static euphoria.psycho.funny.FileItemComparator.SORT_BY_ASCENDING;
 import static euphoria.psycho.funny.FileItemComparator.SORT_BY_DESCENDING;

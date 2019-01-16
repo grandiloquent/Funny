@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 package euphoria.psycho.funny.ui;
+
 import android.view.View;
+
 import androidx.annotation.Nullable;
 /**
  * Interface for time bar views that can display a playback position, buffered position, duration

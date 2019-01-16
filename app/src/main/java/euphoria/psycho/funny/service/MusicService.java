@@ -28,9 +28,9 @@ import java.util.List;
 import java.util.Locale;
 
 import androidx.annotation.Nullable;
-import euphoria.psycho.funny.model.MediaItem;
 import euphoria.psycho.funny.MediaUtils;
 import euphoria.psycho.funny.helper.NotificationHelper;
+import euphoria.psycho.funny.model.MediaItem;
 import euphoria.psycho.funny.util.AndroidServices;
 
 import static euphoria.psycho.funny.fragment.FileFragment.EXTRA_PATH;

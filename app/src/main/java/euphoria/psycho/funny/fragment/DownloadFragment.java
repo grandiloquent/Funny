@@ -25,7 +25,6 @@ import euphoria.psycho.funny.R;
 import euphoria.psycho.funny.adapter.DownloadAdapter;
 import euphoria.psycho.funny.model.DownloadInfo;
 import euphoria.psycho.funny.service.DownloadService;
-import euphoria.psycho.funny.util.debug.Log;
 
 public class DownloadFragment extends Fragment implements DownloadAdapter.MenuListener {
     private static final String TAG = "Funny/DownloadFragment";

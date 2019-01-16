@@ -11,10 +11,9 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import euphoria.psycho.funny.model.DownloadInfo;
 import euphoria.psycho.funny.R;
+import euphoria.psycho.funny.model.DownloadInfo;
 import euphoria.psycho.funny.util.FileUtils;
-import euphoria.psycho.funny.util.debug.Log;
 
 public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHolder> {
     private static final String TAG = "Funny/DownloadAdapter";

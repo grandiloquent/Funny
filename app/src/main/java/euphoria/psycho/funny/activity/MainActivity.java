@@ -12,30 +12,32 @@ import com.google.android.material.navigation.NavigationView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import euphoria.psycho.funny.R;
 import euphoria.psycho.funny.fragment.DownloadFragment;
 import euphoria.psycho.funny.fragment.FileFragment;
-import euphoria.psycho.funny.R;
-import euphoria.psycho.funny.fragment.HiddenCameraFragment;
 import euphoria.psycho.funny.fragment.TranslateFragment;
 import euphoria.psycho.funny.util.AndroidServices;
-import euphoria.psycho.funny.util.debug.Log;
 import euphoria.psycho.funny.util.BaseAppCompatActivity;
+import euphoria.psycho.funny.util.debug.Log;
 
 public class MainActivity extends BaseAppCompatActivity {
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "Funny/MainActivity";
     AppBarLayout mAppbar;
     DrawerLayout mDrawer;
     ActionBarDrawerToggle mDrawerToggle;
     NavigationView mNavigation;
     private OnBackPressed mOnBackPressed;
+    private SearchView mSearchView;
 
     private void actionOpenDrawer() {
         mDrawer.openDrawer(GravityCompat.START);
     }
-
 
     private boolean selectDrawerItem(MenuItem menuItem) {
         Class fragmentClass = null;
@@ -67,10 +69,7 @@ public class MainActivity extends BaseAppCompatActivity {
         }
         if (fragmentClass != null) {
             try {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.content, (Fragment) fragmentClass.newInstance())
-                        .commit();
+                showFragment(fragmentClass);
             } catch (Exception e) {
                 Log.e(TAG, "[selectDrawerItem] ---> ", e);
             }
@@ -83,6 +82,15 @@ public class MainActivity extends BaseAppCompatActivity {
 
     public void setOnBackPressed(OnBackPressed onBackPressed) {
         mOnBackPressed = onBackPressed;
+    }
+
+    private void showFragment(Class klass) throws InstantiationException, IllegalAccessException {
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction();
+        String tag = klass.getCanonicalName();
+        transaction.addToBackStack(tag);
+        transaction.replace(R.id.content, (Fragment) klass.newInstance(), tag)
+                .commit();
     }
 
     @Override
@@ -117,6 +125,12 @@ public class MainActivity extends BaseAppCompatActivity {
     @Override
     public void initView() {
         super.initView();
+        Toolbar toolbar = getToolbar();
+
+        toolbar.setNavigationIcon(android.R.drawable.ic_notification_clear_all);
+        toolbar.setNavigationOnClickListener(v -> {
+            mDrawer.openDrawer(GravityCompat.START);
+        });
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawer, getToolbar(), R.string.drawer_open, R.string.drawer_close);
         mDrawer.addDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
@@ -127,25 +141,46 @@ public class MainActivity extends BaseAppCompatActivity {
     @Override
     public void initialize() {
         super.initialize();
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.content, new FileFragment())
-                .commit();
+        Log.d(TAG, "[initialize] ---> ");
+        try {
+            showFragment(FileFragment.class);
+        } catch (Exception e) {
+            Log.e(TAG, "[initialize] ---> ", e);
+        }
 
 
     }
 
-
     @Override
     public void onBackPressed() {
-        if (mOnBackPressed == null || !mOnBackPressed.onPressed())
-            super.onBackPressed();
+        Log.d(TAG, "[onBackPressed] ---> ");
+        if (mDrawer.isDrawerOpen(GravityCompat.START)) {
+            mDrawer.closeDrawers();
+        } else if (!isFragment() || (mOnBackPressed == null || !mOnBackPressed.onPressed())) {
+            Log.d(TAG, "[onBackPressed] ---> " + getSupportFragmentManager().getBackStackEntryCount());
+            if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                getSupportFragmentManager().popBackStack();
+            } else {
+                super.onBackPressed();
+            }
+        }
     }
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    private boolean isFragment() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FileFragment.class.getCanonicalName());
+        return fragment != null && fragment.isVisible();
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
     }
 
     @Override

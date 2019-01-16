@@ -37,7 +37,6 @@ import euphoria.psycho.funny.R;
 import euphoria.psycho.funny.service.ServerService;
 import euphoria.psycho.funny.util.AndroidServices;
 import euphoria.psycho.funny.util.BaseAppCompatActivity;
-import euphoria.psycho.funny.util.Simple;
 import euphoria.psycho.funny.util.debug.Log;
 
 public class ServerActivity extends BaseAppCompatActivity {

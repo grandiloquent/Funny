@@ -21,7 +21,6 @@ import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -69,7 +68,7 @@ import static android.app.Activity.RESULT_OK;
 // https://developer.android.com/guide/components/fragments
 // https://developer.android.com/reference/android/app/Fragment
 public class FileFragment extends Fragment implements FileAdapter.Callback {
-    public static final String EXTRA_PATH = "_tag_";
+    public static final String EXTRA_PATH = "path";
     public static final String EXTRA_REFRESH = "refresh";
     public static final int REQUEST_OPEN_DOCUMENT_TREE = 100;
     private static final String DEFAULT_DIRECTORY_NAME = "Videos";
@@ -79,7 +78,7 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
     private static final String KEY_TREE_URI = "tree_uri";
     private static final int REQUEST_VIDEO_ACTIVITY_CODE = 1;
     private static final String STATE_SCROLL_POSITION = "";
-    private static final String TAG = "FileFragment";
+    private static final String TAG = "Funny/FileFragment";
     private File mDirectory;
     private FileAdapter mFileAdapter;
     private List<File> mFiles;
@@ -371,17 +370,10 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
 
     @WorkerThread
     private void refreshRecyclerView() {
+        Log.d(TAG, "[refreshRecyclerView] ---> " + mDirectory.getName());
         List<FileItem> items = getFileItems(mDirectory);
         ThreadUtils.postOnMainThread(() -> {
             mFileAdapter.setFileItems(items);
-        });
-    }
-
-    @WorkerThread
-    private void updateRecyclerView() {
-        List<FileItem> items = getFileItems(mDirectory);
-        ThreadUtils.postOnMainThread(() -> {
-            mFileAdapter.updateFileItems(items);
         });
     }
 
@@ -408,6 +400,14 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
         mSortAscending = ascending;
         mPreferences.edit().putInt(KEY_SORT_DIRECTION, mSortAscending ? 1 : 0).apply();
         refreshRecyclerView();
+    }
+
+    @WorkerThread
+    private void updateRecyclerView() {
+        List<FileItem> items = getFileItems(mDirectory);
+        ThreadUtils.postOnMainThread(() -> {
+            mFileAdapter.updateFileItems(items);
+        });
     }
 
     protected static void listVideoFiles(File f1, List<String> names) {
@@ -445,7 +445,6 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        Log.e(TAG, "[onActivityResult] ---> ");
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_VIDEO_ACTIVITY_CODE) {
@@ -487,6 +486,7 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "[onCreateView] ---> ");
         if (container == null) {
             return null;
         }
