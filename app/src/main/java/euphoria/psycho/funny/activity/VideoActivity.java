@@ -1,6 +1,7 @@
 package euphoria.psycho.funny.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -59,6 +60,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.documentfile.provider.DocumentFile;
 import euphoria.psycho.funny.R;
 import euphoria.psycho.funny.cache.Bookmarker;
+import euphoria.psycho.funny.fragment.FileFragment;
 import euphoria.psycho.funny.helper.VideoTouchHelper;
 import euphoria.psycho.funny.ui.TimeBar;
 import euphoria.psycho.funny.util.FileUtils;
@@ -141,6 +143,7 @@ public class VideoActivity extends BaseVideoActivity implements
                     mPlayer.prepare(mediaSource);
                     seekToFile(mFiles[mStartWindow]);
                 }
+                setRefreshResult();
 
             }
         });
@@ -176,7 +179,7 @@ public class VideoActivity extends BaseVideoActivity implements
                         }
 
                         seekToFile(targetFile);
-
+                        setRefreshResult();
                     }
 
                     @Override
@@ -467,6 +470,12 @@ public class VideoActivity extends BaseVideoActivity implements
         view.setEnabled(enabled);
         view.setAlpha(enabled ? 1f : 0.3f);
         view.setVisibility(View.VISIBLE);
+    }
+
+    private void setRefreshResult() {
+        Intent intent = new Intent();
+        intent.putExtra(FileFragment.EXTRA_REFRESH, true);
+        setResult(RESULT_OK, intent);
     }
 
     private void setupView() {

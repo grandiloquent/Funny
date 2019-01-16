@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.android.material.appbar.AppBarLayout;
@@ -40,6 +41,9 @@ public class MainActivity extends BaseAppCompatActivity {
     }
 
     private boolean selectDrawerItem(MenuItem menuItem) {
+        Menu menu = mNavigation.getMenu();
+
+
         Class fragmentClass = null;
 
         int id = menuItem.getItemId();
@@ -47,14 +51,24 @@ public class MainActivity extends BaseAppCompatActivity {
         switch (id) {
             case R.id.action_fragment_file: {
                 fragmentClass = FileFragment.class;
+                menuItem.setChecked(true);
+                menu.findItem(R.id.action_download).setChecked(false);
+                menu.findItem(R.id.action_translate).setChecked(false);
                 break;
             }
             case R.id.action_download: {
                 fragmentClass = DownloadFragment.class;
+
+                menuItem.setChecked(true);
+                menu.findItem(R.id.action_translate).setChecked(false);
+                menu.findItem(R.id.action_fragment_file).setChecked(false);
                 break;
             }
             case R.id.action_translate: {
                 fragmentClass = TranslateFragment.class;
+                menuItem.setChecked(true);
+                menu.findItem(R.id.action_download).setChecked(false);
+                menu.findItem(R.id.action_fragment_file).setChecked(false);
                 break;
             }
             case R.id.action_hidden_camera:
@@ -73,7 +87,7 @@ public class MainActivity extends BaseAppCompatActivity {
             } catch (Exception e) {
                 Log.e(TAG, "[selectDrawerItem] ---> ", e);
             }
-            menuItem.setChecked(true);
+
             mDrawer.closeDrawers();
         }
         return false;
@@ -89,6 +103,7 @@ public class MainActivity extends BaseAppCompatActivity {
                 .beginTransaction();
         String tag = klass.getCanonicalName();
         transaction.addToBackStack(tag);
+        //transaction.setCustomAnimations(R.anim.slide_out_down, R.anim.slide_in_down);
         transaction.replace(R.id.content, (Fragment) klass.newInstance(), tag)
                 .commit();
     }
@@ -134,6 +149,7 @@ public class MainActivity extends BaseAppCompatActivity {
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawer, getToolbar(), R.string.drawer_open, R.string.drawer_close);
         mDrawer.addDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
+
         mNavigation.setNavigationItemSelectedListener(this::selectDrawerItem);
 
     }
