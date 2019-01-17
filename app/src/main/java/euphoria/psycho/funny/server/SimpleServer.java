@@ -142,13 +142,13 @@ public class SimpleServer {
         try {
             OutputStream os = socket.getOutputStream();
             List<String> headers = new ArrayList<>();
-            String extension = substringAfterLast(fileName, '.');
+            String extension =  substringAfterLast(fileName, '.');
             headers.add(HTTP_CONTENT_TYPE);
             headers.add(mMimeTypes.get(extension));//  "; charset=UTF-8"
 
             if (extension != null) {
                 switch (extension.toLowerCase()) {
-                    case ".html":
+                    case "html":
 
                         headers.add(HTTP_CACHE_CONTROL);
                         headers.add("no-cache");
@@ -160,9 +160,9 @@ public class SimpleServer {
 //                        headers.add(HEADER_VALUE_NO_CACHE);
 //                        break;
 //                    }
-                    case ".js":
-                    case ".css":
-                    case ".png":
+                    case "js":
+                    case "css":
+                    case "png":
 
                         headers.add(HTTP_CACHE_CONTROL);
 
@@ -170,7 +170,7 @@ public class SimpleServer {
                         break;
                 }
             }
-            if (extension != null && extension.equals(".png")) {
+            if (extension != null && extension.equals("png")) {
                 File bitmap = png(fileName);
                 if (bitmap == null) {
                     notFound(socket);
@@ -360,12 +360,12 @@ public class SimpleServer {
                 }
             }
 
-            Log.d(TAG, "[jsonUpdate] ---> " + header[1].length + " " + length + " " + Utils.getString(header[1]));
+            // Log.d(TAG, "[jsonUpdate] ---> " + header[1].length + " " + length + " " + Utils.getString(header[1]));
             Gson gson = new Gson();
             Note note = null;
             if (header[1] != null && header[1].length == length) {
                 note = gson.fromJson(Utils.getString(header[1]), Note.class);
-                return;
+
             } else {
                 byte[] bytes = header[1] == null ? new byte[0] : header[1];
 
