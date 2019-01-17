@@ -6,6 +6,8 @@
 * 视频播放器
 * Android Web 服务器
 
+## 截屏
+
 <div>
 <img width="240" src="screenshots/screen1.png"/>
 <img width="240" src="screenshots/screen2.png"/>
