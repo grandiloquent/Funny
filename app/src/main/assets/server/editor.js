@@ -45,9 +45,9 @@
     Editor.prototype.collect = function () {
         var obj = {};
         var hash = window.location.hash;
-        if (hash.length < 1) return;
-        hash = hash.substring(1);
-        obj['id'] = parseInt(hash) || 0;
+        if (hash.length > 0)
+            hash = hash.substring(1);
+        obj['id'] = parseInt(hash) || -1;
         var value = this.mde.value().trim();
         if (value.length < 1) return null;;
         var p = value.indexOf('\n');
@@ -59,6 +59,7 @@
         }
         obj['title'] = title;
         obj['content'] = value;
+        console.log(obj);
         return obj;
     }
     Editor.prototype.onFetch = function (hash) {

@@ -709,11 +709,27 @@ class Utils {
         }
     }
 
+    static int fromBytes(byte[] bytes) {
+        return bytes[0] << 24 | (bytes[1] & 0xFF) << 16 | (bytes[2] & 0xFF) << 8 | (bytes[3] & 0xFF);
+    }
+
+    static byte[] toBytes(int i) {
+        byte[] result = new byte[4];
+
+        result[0] = (byte) (i >> 24);
+        result[1] = (byte) (i >> 16);
+        result[2] = (byte) (i >> 8);
+        result[3] = (byte) (i /*>> 0*/);
+
+        return result;
+    }
+
     static byte[][] sliceHeader(InputStream is, byte[] bytes) throws IOException {
         int bufferSize = 1024 * 8;
         int len;
         byte[] buffer = new byte[bufferSize];
         if ((len = is.read(buffer, 0, bufferSize)) != -1) {
+
 
             if (bytes != null && bytes.length > 0)
                 buffer = addAll(bytes, buffer);
@@ -724,15 +740,16 @@ class Utils {
             }
             byte[] buf1 = Arrays.copyOfRange(buffer, 0, index);
             byte[] buf2 = null;
+            len += bytes.length;
             if (len - index > 4) {
-                buf2 = Arrays.copyOfRange(buffer, index + 4, buffer.length);
+                buf2 = Arrays.copyOfRange(buffer, index + 4, len);
             }
 
 
             return new byte[][]{
                     buf1,
                     buf2,
-                    len < bufferSize ? new byte[]{0} : new byte[]{1}
+                    toBytes(len)
             };
         }
         return null;
