@@ -111,7 +111,7 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
         StringBuilder sb = new StringBuilder();
 
         for (String n : names) {
-            sb.append(n).append('\n');
+            sb.append("* "+n).append('\n');
         }
 
         Simple.setClipboardText(getContext(), Simple.sort(sb.toString()));

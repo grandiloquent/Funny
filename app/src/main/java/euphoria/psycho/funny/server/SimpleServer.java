@@ -128,7 +128,7 @@ public class SimpleServer {
         mPort = mServerSocket.getLocalPort();
         mURL = "http://" + mServerSocket.getInetAddress().getHostAddress() + ":" + mPort;
 
-        Log.d(TAG, "[SimpleServer] ---> " + mURL);
+        // Log.d(TAG, "[SimpleServer] ---> " + mURL);
         mExecutorService = Executors.newFixedThreadPool(4);
 
         mVideoFiles = getVideoFiles(mVideoDirectory);
@@ -315,7 +315,7 @@ public class SimpleServer {
     }
 
     private void jsonGet(Socket socket, String url) {
-        Log.d(TAG, "[jsonGet] ---> ");
+        // Log.d(TAG, "[jsonGet] ---> ");
         try {
 
             long hash = Utils.safeParseLong(Utils.substringAfterLast(url, '/'));
@@ -325,7 +325,7 @@ public class SimpleServer {
             }
             List<String> headers = generateGenericHeader("application/json; charset=utf-8", HEADER_VALUE_NO_CACHE);
             writeHeaders(socket, STATUS_CODE_OK, headers);
-            Log.d(TAG, "[jsonGet] ---> " + hash);
+            // Log.d(TAG, "[jsonGet] ---> " + hash);
             Note note = DatabaseHelper.getInstance(AndroidContext.instance().get()).fetchNote(hash);
             if (note == null) {
                 notFound(socket);
@@ -391,7 +391,7 @@ public class SimpleServer {
 
 
         } catch (Exception e) {
-            Log.e(TAG, "[jsonUpdate] ---> ", e);
+            // Log.e(TAG, "[jsonUpdate] ---> ", e);
         } finally {
             closeQuietly(socket);
         }
@@ -412,7 +412,7 @@ public class SimpleServer {
             socket.getOutputStream().write(getmBytesMarkdown[1]);
 
         } catch (IOException e) {
-            Log.e(TAG, "[markdown] ---> ", e);
+            // Log.e(TAG, "[markdown] ---> ", e);
         } finally {
             closeQuietly(socket);
         }
@@ -498,7 +498,7 @@ public class SimpleServer {
             }
 
             String[] u = parseURL(status[0]);
-            Log.d(TAG, "[processRequest] ---> " + u[1]);
+            // Log.d(TAG, "[processRequest] ---> " + u[1]);
             if (u[1].length() == 0/* / */) {
                 if (u[2] == null) {
                     index(socket);
