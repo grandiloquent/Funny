@@ -1,6 +1,9 @@
 package euphoria.psycho.funny.server;
 
 import android.graphics.Bitmap;
+import android.text.Html;
+
+import com.google.gson.Gson;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -19,6 +22,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +37,7 @@ import java.util.concurrent.Executors;
 
 import euphoria.psycho.funny.util.AndroidContext;
 import euphoria.psycho.funny.util.BitmapUtils;
+import euphoria.psycho.funny.util.debug.Log;
 
 import static euphoria.psycho.funny.server.Utils.addAll;
 import static euphoria.psycho.funny.server.Utils.closeQuietly;
@@ -42,6 +47,11 @@ import static euphoria.psycho.funny.server.Utils.getMimeTypeTable;
 import static euphoria.psycho.funny.server.Utils.getVideoFiles;
 import static euphoria.psycho.funny.server.Utils.isVideo;
 import static euphoria.psycho.funny.server.Utils.lookup;
+import static euphoria.psycho.funny.server.Utils.parseHeaders;
+import static euphoria.psycho.funny.server.Utils.parseQuery;
+import static euphoria.psycho.funny.server.Utils.parseURL;
+import static euphoria.psycho.funny.server.Utils.sliceHeader;
+import static euphoria.psycho.funny.server.Utils.sliceURL;
 import static euphoria.psycho.funny.server.Utils.substringAfter;
 import static euphoria.psycho.funny.server.Utils.substringAfterLast;
 import static euphoria.psycho.funny.server.Utils.substringBefore;
@@ -55,6 +65,7 @@ public class SimpleServer {
     private static final byte[] BYTES_LINE_FEED = new byte[]{'\r', '\n'};
     private static final String DATE_FORMAT_GMT = " EEE, dd MMM yyyy hh:mm:ss 'GMT'";
     private static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
+    private static final String HEADER_VALUE_NO_CACHE = "no-cache";
     static final String HTTP_ACCEPT_RANGES = "Accept-Ranges";
     private static final String HTTP_CACHE_CONTROL = "Cache-Control";
     static final String HTTP_CONTENT_DISPOSITION = "Content-Disposition";
@@ -73,6 +84,10 @@ public class SimpleServer {
     private static final int STATUS_CODE_PARTIAL_CONTENT = 206;
     private static final String TAG = "Funny/SimpleServer";
     private static final String UTF_8 = "UTF-8";
+    private static final byte[][] getmBytesMarkdown = new byte[][]{
+/* 0 notelist */new byte[]{60, 33, 68, 79, 67, 84, 89, 80, 69, 32, 104, 116, 109, 108, 62, 60, 104, 116, 109, 108, 32, 108, 97, 110, 103, 61, 34, 101, 110, 34, 62, 60, 104, 101, 97, 100, 62, 60, 109, 101, 116, 97, 32, 99, 104, 97, 114, 115, 101, 116, 61, 34, 85, 84, 70, 45, 56, 34, 47, 62, 60, 109, 101, 116, 97, 32, 110, 97, 109, 101, 61, 34, 118, 105, 101, 119, 112, 111, 114, 116, 34, 32, 99, 111, 110, 116, 101, 110, 116, 61, 34, 119, 105, 100, 116, 104, 61, 100, 101, 118, 105, 99, 101, 45, 119, 105, 100, 116, 104, 44, 32, 105, 110, 105, 116, 105, 97, 108, 45, 115, 99, 97, 108, 101, 61, 49, 46, 48, 34, 47, 62, 60, 109, 101, 116, 97, 32, 104, 116, 116, 112, 45, 101, 113, 117, 105, 118, 61, 34, 88, 45, 85, 65, 45, 67, 111, 109, 112, 97, 116, 105, 98, 108, 101, 34, 32, 99, 111, 110, 116, 101, 110, 116, 61, 34, 105, 101, 61, 101, 100, 103, 101, 34, 47, 62, 60, 116, 105, 116, 108, 101, 62, 68, 111, 99, 117, 109, 101, 110, 116, 60, 47, 116, 105, 116, 108, 101, 62, 60, 108, 105, 110, 107, 32, 114, 101, 108, 61, 34, 115, 116, 121, 108, 101, 115, 104, 101, 101, 116, 34, 32, 104, 114, 101, 102, 61, 34, 104, 116, 116, 112, 115, 58, 47, 47, 99, 100, 110, 106, 115, 46, 99, 108, 111, 117, 100, 102, 108, 97, 114, 101, 46, 99, 111, 109, 47, 97, 106, 97, 120, 47, 108, 105, 98, 115, 47, 115, 105, 109, 112, 108, 101, 109, 100, 101, 47, 49, 46, 49, 49, 46, 50, 47, 115, 105, 109, 112, 108, 101, 109, 100, 101, 46, 109, 105, 110, 46, 99, 115, 115, 34, 47, 62, 60, 115, 99, 114, 105, 112, 116, 32, 115, 114, 99, 61, 34, 104, 116, 116, 112, 115, 58, 47, 47, 99, 100, 110, 106, 115, 46, 99, 108, 111, 117, 100, 102, 108, 97, 114, 101, 46, 99, 111, 109, 47, 97, 106, 97, 120, 47, 108, 105, 98, 115, 47, 115, 105, 109, 112, 108, 101, 109, 100, 101, 47, 49, 46, 49, 49, 46, 50, 47, 115, 105, 109, 112, 108, 101, 109, 100, 101, 46, 109, 105, 110, 46, 106, 115, 34, 62, 60, 47, 115, 99, 114, 105, 112, 116, 62, 60, 108, 105, 110, 107, 32, 114, 101, 108, 61, 34, 115, 116, 121, 108, 101, 115, 104, 101, 101, 116, 34, 32, 104, 114, 101, 102, 61, 34, 101, 100, 105, 116, 111, 114, 46, 99, 115, 115, 34, 47, 62, 60, 98, 111, 100, 121, 62, 60, 100, 105, 118, 32, 99, 108, 97, 115, 115, 61, 34, 99, 111, 110, 116, 97, 105, 110, 101, 114, 34, 62, 60, 100, 105, 118, 32, 99, 108, 97, 115, 115, 61, 34, 108, 105, 115, 116, 34, 62},
+/* 1  */new byte[]{60, 47, 100, 105, 118, 62, 60, 100, 105, 118, 32, 99, 108, 97, 115, 115, 61, 34, 101, 100, 105, 116, 111, 114, 34, 62, 60, 116, 101, 120, 116, 97, 114, 101, 97, 32, 105, 100, 61, 34, 101, 100, 105, 116, 45, 116, 101, 120, 116, 34, 62, 60, 47, 116, 101, 120, 116, 97, 114, 101, 97, 62, 60, 47, 100, 105, 118, 62, 60, 47, 100, 105, 118, 62, 60, 115, 99, 114, 105, 112, 116, 32, 115, 114, 99, 61, 34, 101, 100, 105, 116, 111, 114, 46, 106, 115, 34, 62, 60, 47, 115, 99, 114, 105, 112, 116, 62},
+    };
     private static final byte[] mBytesDropZone = new byte[]{60, 100, 105, 118, 32, 105, 100, 61, 34, 100, 114, 111, 112, 122, 111, 110, 101, 34, 62, 60, 102, 111, 114, 109, 32, 99, 108, 97, 115, 115, 61, 34, 100, 114, 111, 112, 122, 111, 110, 101, 34, 32, 97, 99, 116, 105, 111, 110, 61, 34, 47, 117, 112, 108, 111, 97, 100, 34, 62, 60, 47, 102, 111, 114, 109, 62, 60, 47, 100, 105, 118, 62};
     private static final byte[][] mBytesIndex = new byte[][]{
 /* 0  */new byte[]{60, 33, 68, 79, 67, 84, 89, 80, 69, 32, 104, 116, 109, 108, 62, 60, 104, 116, 109, 108, 62, 60, 104, 101, 97, 100, 62, 60, 109, 101, 116, 97, 32, 104, 116, 116, 112, 45, 101, 113, 117, 105, 118, 61, 34, 88, 45, 85, 65, 45, 67, 111, 109, 112, 97, 116, 105, 98, 108, 101, 34, 32, 99, 111, 110, 116, 101, 110, 116, 61, 34, 73, 69, 61, 101, 100, 103, 101, 34, 47, 62, 60, 109, 101, 116, 97, 32, 99, 104, 97, 114, 115, 101, 116, 61, 34, 117, 116, 102, 45, 56, 34, 47, 62, 60, 116, 105, 116, 108, 101, 62, 60, 47, 116, 105, 116, 108, 101, 62, 60, 109, 101, 116, 97, 32, 110, 97, 109, 101, 61, 34, 100, 101, 115, 99, 114, 105, 112, 116, 105, 111, 110, 34, 32, 99, 111, 110, 116, 101, 110, 116, 61, 34, 34, 47, 62, 60, 109, 101, 116, 97, 32, 110, 97, 109, 101, 61, 34, 97, 117, 116, 104, 111, 114, 34, 32, 99, 111, 110, 116, 101, 110, 116, 61, 34, 34, 47, 62, 60, 109, 101, 116, 97, 32, 110, 97, 109, 101, 61, 34, 118, 105, 101, 119, 112, 111, 114, 116, 34, 32, 99, 111, 110, 116, 101, 110, 116, 61, 34, 119, 105, 100, 116, 104, 61, 100, 101, 118, 105, 99, 101, 45, 119, 105, 100, 116, 104, 44, 32, 105, 110, 105, 116, 105, 97, 108, 45, 115, 99, 97, 108, 101, 61, 49, 34, 47, 62, 60, 108, 105, 110, 107, 32, 114, 101, 108, 61, 34, 115, 116, 121, 108, 101, 115, 104, 101, 101, 116, 34, 32, 104, 114, 101, 102, 61, 34, 100, 114, 111, 112, 122, 111, 110, 101, 46, 109, 105, 110, 46, 99, 115, 115, 34, 47, 62, 60, 108, 105, 110, 107, 32, 114, 101, 108, 61, 34, 115, 116, 121, 108, 101, 115, 104, 101, 101, 116, 34, 32, 104, 114, 101, 102, 61, 34, 109, 97, 105, 110, 46, 109, 105, 110, 46, 99, 115, 115, 34, 47, 62, 60, 33, 45, 45, 91, 105, 102, 32, 108, 116, 32, 73, 69, 32, 57, 93, 62, 60, 115, 99, 114, 105, 112, 116, 32, 115, 114, 99, 61, 34, 47, 47, 99, 100, 110, 106, 115, 46, 99, 108, 111, 117, 100, 102, 108, 97, 114, 101, 46, 99, 111, 109, 47, 97, 106, 97, 120, 47, 108, 105, 98, 115, 47, 104, 116, 109, 108, 53, 115, 104, 105, 118, 47, 51, 46, 55, 46, 50, 47, 104, 116, 109, 108, 53, 115, 104, 105, 118, 46, 109, 105, 110, 46, 106, 115, 34, 62, 60, 47, 115, 99, 114, 105, 112, 116, 62, 60, 115, 99, 114, 105, 112, 116, 32, 115, 114, 99, 61, 34, 47, 47, 99, 100, 110, 106, 115, 46, 99, 108, 111, 117, 100, 102, 108, 97, 114, 101, 46, 99, 111, 109, 47, 97, 106, 97, 120, 47, 108, 105, 98, 115, 47, 114, 101, 115, 112, 111, 110, 100, 46, 106, 115, 47, 49, 46, 52, 46, 50, 47, 114, 101, 115, 112, 111, 110, 100, 46, 109, 105, 110, 46, 106, 115, 34, 62, 60, 47, 115, 99, 114, 105, 112, 116, 62, 60, 33, 91, 101, 110, 100, 105, 102, 93, 45, 45, 62, 60, 115, 99, 114, 105, 112, 116, 32, 115, 114, 99, 61, 34, 100, 114, 111, 112, 122, 111, 110, 101, 46, 109, 105, 110, 46, 106, 115, 34, 62, 60, 47, 115, 99, 114, 105, 112, 116, 62, 60, 98, 111, 100, 121, 62, 60, 100, 105, 118, 32, 99, 108, 97, 115, 115, 61, 34, 99, 111, 110, 116, 97, 105, 110, 101, 114, 34, 62},
@@ -82,8 +97,6 @@ public class SimpleServer {
 /* 0 src */new byte[]{60, 100, 105, 118, 32, 105, 100, 61, 34, 112, 108, 97, 121, 101, 114, 34, 32, 99, 108, 97, 115, 115, 61, 34, 112, 108, 97, 121, 101, 114, 45, 97, 112, 105, 32, 112, 108, 97, 121, 101, 114, 45, 115, 105, 122, 101, 34, 62, 60, 100, 105, 118, 32, 99, 108, 97, 115, 115, 61, 34, 104, 116, 109, 108, 53, 45, 118, 105, 100, 101, 111, 45, 99, 111, 110, 116, 97, 105, 110, 101, 114, 34, 62, 60, 118, 105, 100, 101, 111, 32, 99, 108, 97, 115, 115, 61, 34, 104, 116, 109, 108, 53, 45, 118, 105, 100, 101, 111, 45, 112, 108, 97, 121, 101, 114, 34, 32, 99, 111, 110, 116, 114, 111, 108, 115, 32, 97, 117, 116, 111, 112, 108, 97, 121, 62, 60, 115, 111, 117, 114, 99, 101, 32, 115, 114, 99, 61, 34},
 /* 1  */new byte[]{34, 32, 116, 121, 112, 101, 61, 34, 118, 105, 100, 101, 111, 47, 109, 112, 52, 34, 47, 62, 60, 47, 118, 105, 100, 101, 111, 62, 60, 47, 100, 105, 118, 62, 60, 47, 100, 105, 118, 62},
     };
-
-
     private final String HTTP_CONTENT_LENGTH = "Content-Length";
     private final ExecutorService mExecutorService;
     private final Hashtable<String, String> mMimeTypes = getMimeTypeTable();
@@ -112,7 +125,7 @@ public class SimpleServer {
         mPort = mServerSocket.getLocalPort();
         mURL = "http://" + mServerSocket.getInetAddress().getHostAddress() + ":" + mPort;
 
-        d(mURL);
+        Log.d(TAG, "[SimpleServer] ---> " + mURL);
         mExecutorService = Executors.newFixedThreadPool(4);
 
         mVideoFiles = getVideoFiles(mVideoDirectory);
@@ -139,10 +152,15 @@ public class SimpleServer {
                         break;
 
                     case ".js":
-                    case ".css":
+                    case ".css": {
+                        headers.add(HTTP_CACHE_CONTROL);
+                        headers.add(HEADER_VALUE_NO_CACHE);
+                        break;
+                    }
                     case ".png":
 
                         headers.add(HTTP_CACHE_CONTROL);
+
                         headers.add("public, max-age=31536000, stale-while-revalidate=2592000");
                         break;
                 }
@@ -236,7 +254,7 @@ public class SimpleServer {
         int index = lookup(data, BYTES_LINE_FEED, offset);
         if (index == -1) return null;
         FormHeader formHeader = new FormHeader();
-        String contentDisposition = toString(Arrays.copyOfRange(data, offset, index));
+        String contentDisposition = Utils.getString(Arrays.copyOfRange(data, offset, index));
         contentDisposition = substringAfter(contentDisposition, "filename=");
         contentDisposition = trim(contentDisposition, new char[]{'"'});
         formHeader.fileName = contentDisposition;
@@ -291,6 +309,61 @@ public class SimpleServer {
         }
     }
 
+    private void jsonGet(Socket socket, String url) {
+        Log.d(TAG, "[jsonGet] ---> ");
+        try {
+
+            long hash = Utils.safeParseLong(Utils.substringAfterLast(url, '/'));
+            if (hash == -1) {
+                send(socket, STATUS_CODE_BAD_REQUEST);
+                return;
+            }
+            List<String> headers = generateGenericHeader("application/json; charset=utf-8", HEADER_VALUE_NO_CACHE);
+            writeHeaders(socket, STATUS_CODE_OK, headers);
+            Log.d(TAG, "[jsonGet] ---> " + hash);
+            Note note = DatabaseHelper.getInstance(AndroidContext.instance().get()).fetchNote(hash);
+            if (note == null) {
+                notFound(socket);
+                return;
+            }
+            Gson gson = new Gson();
+
+            socket.getOutputStream().write(Utils.getBytes(gson.toJson(note, Note.class)));
+
+
+        } catch (Exception e) {
+
+        } finally {
+            closeQuietly(socket);
+        }
+    }
+
+    private void markdown(Socket socket) throws UnsupportedEncodingException {
+        List<Note> titles = DatabaseHelper.getInstance(AndroidContext.instance().get()).fetchTitles();
+        StringBuilder sb = new StringBuilder();
+        Log.d(TAG, "[markdown] ---> " + titles.size());
+        for (Note note : titles) {
+            sb.append("<a class=\"list-item\" href=\"/md#" + note.ID + "\">\n" +
+                    "                <h3 class=\"list-heading  clearfix\">\n" +
+                    "                    <span class=\"list-title\">" + Html.escapeHtml(note.Title) + "</span>\n" +
+                    "                </h3>\n" +
+                    "            </a>");
+        }
+        List<String> headers = generateGenericHeader("text/html", "no-cache");
+
+        try {
+            writeHeaders(socket, STATUS_CODE_OK, headers);
+            socket.getOutputStream().write(getmBytesMarkdown[0]);
+            socket.getOutputStream().write(sb.toString().getBytes(Charset.forName(UTF_8)));
+            socket.getOutputStream().write(getmBytesMarkdown[1]);
+
+        } catch (IOException e) {
+            Log.e(TAG, "[markdown] ---> ", e);
+        } finally {
+            closeQuietly(socket);
+        }
+
+    }
 
     private Position nextLine(byte[] data, byte[] boundary, int offset) {
         int length = data.length;
@@ -338,104 +411,6 @@ public class SimpleServer {
         send(socket, STATUS_CODE_NOT_FOUND);
     }
 
-    private List<String> parseHeaders(byte[] buffer) {
-        List<String> headers = new ArrayList<>();
-        int len = buffer.length;
-        int offset = 0;
-        boolean skip = false;
-        for (int i = 0; i < len; i++) {
-            if (!skip && buffer[i] == ':') {
-                headers.add(toString(Arrays.copyOfRange(buffer, offset, i)));
-                offset = i + 1;
-                skip = true;
-            }
-            if (buffer[i] == '\r') {
-                while (buffer[offset] == ' ') {
-                    offset++;
-                }
-                headers.add(toString(Arrays.copyOfRange(buffer, offset, i)));
-                offset = i + 2;
-                skip = false;
-            }
-        }
-        if (offset < len) {
-            headers.add(toString(Arrays.copyOfRange(buffer, offset, len)));
-        }
-        return headers;
-    }
-
-    private List<String> parseQuery(String parameter) throws UnsupportedEncodingException {
-        List<String> parameters = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
-        boolean decode = false;
-
-        // set i = 1 to skip the start character ' ?'
-        for (int i = 1; i < parameter.length(); i++) {
-            char ch = parameter.charAt(i);
-            if (ch == '=' || ch == '&') {
-                if (decode) {
-                    parameters.add(URLDecoder.decode(sb.toString(), UTF_8));
-                } else {
-                    parameters.add(sb.toString());
-                }
-                decode = false;
-                sb.setLength(0);
-            } else {
-                if (ch == '%') {
-                    decode = true;
-                }
-                sb.append(ch);
-            }
-        }
-        if (sb.length() > 0) {
-            if (decode) {
-                parameters.add(URLDecoder.decode(sb.toString(), UTF_8));
-            } else {
-                parameters.add(sb.toString());
-            }
-        }
-        return parameters;
-    }
-
-    private String[] parseURL(byte[] buffer) {
-
-
-        int p1 = 0, p2 = 0, p3 = 0;
-
-        for (int i = 0; i < buffer.length; i++) {
-            if (p1 == 0) {
-                if (buffer[i] == '/')
-                    p1 = i + 1;
-            } else if (p3 == 0 && buffer[i] == ' ') {
-                p3 = i;
-            }
-            if (p2 == 0 && buffer[i] == '?') {
-                p2 = i;
-            }
-        }
-        String method = null;
-        if (p1 > 0) {
-            method = toString(Arrays.copyOfRange(buffer, 0, p1 - 1)).trim();
-        }
-        String url = null;
-        String parameter = null;
-        if (p2 != 0) {
-
-            url = toString(Arrays.copyOfRange(buffer, p1, p2));
-            parameter = toString(Arrays.copyOfRange(buffer, p2, p3));
-        } else {
-
-            url = toString(Arrays.copyOfRange(buffer, p1, p3));
-
-        }
-
-        return new String[]{
-                method,
-                url,
-                parameter
-        };
-    }
-
     private File png(String fileName) {
         File bitmap = new File(mStaticDirectory, fileName);
         if (bitmap.isFile()) {
@@ -469,7 +444,7 @@ public class SimpleServer {
             }
 
             String[] u = parseURL(status[0]);
-            // Log.d(TAG, "[processRequest] ---> uri = " + u[1]);
+            Log.d(TAG, "[processRequest] ---> " + u[1]);
             if (u[1].length() == 0/* / */) {
                 if (u[2] == null) {
                     index(socket);
@@ -483,6 +458,8 @@ public class SimpleServer {
                     processVideoPage(socket, parameters.get(1));
                 }
                 return;
+            } else if (u[1].equals("md")) {
+                markdown(socket);
             } else if (u[1].lastIndexOf('.') != -1) {
                 if (isVideo(u[1])) {
                     d(URLDecoder.decode(u[1], UTF_8));
@@ -495,8 +472,10 @@ public class SimpleServer {
             } else if (u[1].equals("upload")) {
                 processUploadFile(socket, is, status[1]);
 
+            } else if (u[1].startsWith("api/get/")) {
+                jsonGet(socket, u[1]);
             } else {
-                d("URI: " + u[1]);
+                notFound(socket);
             }
 
 
@@ -691,62 +670,6 @@ public class SimpleServer {
     }
 
 
-    private byte[][] sliceHeader(InputStream is, byte[] bytes) throws IOException {
-        int bufferSize = 1024 * 8;
-        int len;
-        byte[] buffer = new byte[bufferSize];
-        if ((len = is.read(buffer, 0, bufferSize)) != -1) {
-
-            if (bytes != null && bytes.length > 0)
-                buffer = addAll(bytes, buffer);
-
-            int index = lookup(buffer, BYTES_DOUBLE_LINE_FEED, 0);
-            if (index == -1) {
-                return null;
-            }
-            byte[] buf1 = Arrays.copyOfRange(buffer, 0, index);
-            byte[] buf2 = null;
-            if (len - index > 4) {
-                buf2 = Arrays.copyOfRange(buffer, index + 4, buffer.length);
-            }
-
-
-            return new byte[][]{
-                    buf1,
-                    buf2,
-                    len < bufferSize ? new byte[]{0} : new byte[]{1}
-            };
-        }
-        return null;
-    }
-
-    private byte[][] sliceURL(InputStream is) throws IOException {
-
-
-        int bufferSize = 256;
-        byte[] buffer = new byte[bufferSize];
-        int len;
-        if ((len = is.read(buffer, 0, bufferSize)) != -1) {
-
-            int index = lookup(buffer, BYTES_LINE_FEED, 0);
-            if (index == -1) {
-                return null;
-            }
-            String x = toString(buffer);
-
-            byte[] buf1 = Arrays.copyOfRange(buffer, 0, index);
-            byte[] buf2 = null;
-            if (len - index > 2) {
-                buf2 = Arrays.copyOfRange(buffer, index + 2, len);
-            }
-            return new byte[][]{
-                    buf1,
-                    buf2
-            };
-        }
-        return null;
-    }
-
     private void startServer() {
         d("Start Server");
         mThread = new Thread(() -> {
@@ -872,16 +795,6 @@ public class SimpleServer {
 
     private static void e(String e) {
         // Log.e(TAG, e);
-    }
-
-
-    private static String toString(byte[] buffer) {
-        try {
-            return new String(buffer, UTF_8);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
 

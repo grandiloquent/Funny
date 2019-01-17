@@ -16,10 +16,7 @@
         android:theme="@style/AppTheme"
         android:windowSoftInputMode="adjustPan">
         <activity android:name=".activity.MainActivity">
-            <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER" />
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
+
         </activity>
         <activity android:name=".hidden.HiddenCameraActivity">
 
@@ -77,10 +74,17 @@
         </activity>
         <activity
             android:name=".activity.ServerActivity"
-            android:launchMode="singleInstance" />
+            android:launchMode="singleInstance" >
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
 
         <service android:name=".service.MusicService" />
-        <service android:name=".service.ServerService" />
+        <service android:name=".service.ServerService" >
+
+        </service>
         <service android:name=".service.DownloadService" />
         <service android:name=".service.HiddenCameraService" />
     </application>

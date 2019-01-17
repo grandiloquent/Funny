@@ -22,8 +22,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "Funny/DatabaseHelper";
     private static final String TITLE = "title";
     private static final String UPDATED_AT = "updated_at";
+
     public DatabaseHelper(Context context) {
-        super(context, new File(Environment.getExternalStorageDirectory(), "database.db").getAbsolutePath(), null, DATABASE_VERSION);
+        super(context, new File(Environment.getExternalStorageDirectory(), "notes_notepad.db").getAbsolutePath(), null, DATABASE_VERSION);
 
     }
 
