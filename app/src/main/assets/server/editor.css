@@ -1,0 +1,18 @@
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .list {
+            width: 300px;
+        }
+
+        .editor {
+            flex-grow: 1;
+        }

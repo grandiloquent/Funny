@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplemde/1.11.2/simplemde.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplemde/1.11.2/simplemde.min.js"></script>
+    <link rel="stylesheet" href="editor.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="list"></div>
+        <div class="editor">
+            <textarea id="edit-text"></textarea>
+        </div>
+    </div>
+    <script>
+        var simplemde = new SimpleMDE({
+            element: document.getElementById("edit-text")
+        });
+    </script>
+</body>
+
+</html>

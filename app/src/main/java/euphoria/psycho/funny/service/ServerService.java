@@ -14,7 +14,7 @@ import java.io.File;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import euphoria.psycho.funny.SimpleServer;
+import euphoria.psycho.funny.server.SimpleServer;
 import euphoria.psycho.funny.util.FileUtils;
 import euphoria.psycho.funny.util.HttpUtils;
 
