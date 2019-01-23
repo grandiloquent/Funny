@@ -1,4 +1,4 @@
-package euphoria.psycho.funny.model;
+package euphoria.psycho.funny.download;
 
 
 public class DownloadInfo {
@@ -13,6 +13,7 @@ public class DownloadInfo {
     public int status;
     public long totalBytes;
     public String url;
+    public long speed;
 
 
     public interface Listener {

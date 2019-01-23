@@ -12,7 +12,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import euphoria.psycho.funny.R;
-import euphoria.psycho.funny.model.DownloadInfo;
+import euphoria.psycho.funny.download.DownloadInfo;
 import euphoria.psycho.funny.util.FileUtils;
 
 public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHolder> {

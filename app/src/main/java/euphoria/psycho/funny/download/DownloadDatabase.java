@@ -1,4 +1,4 @@
-package euphoria.psycho.funny;
+package euphoria.psycho.funny.download;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,14 +11,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import euphoria.psycho.funny.download.DownloadInfo;
-
-
-public class DownloadInfoDatabase extends SQLiteOpenHelper {
+public class DownloadDatabase extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
-    private static volatile DownloadInfoDatabase INSTANCE;
+    private static volatile euphoria.psycho.funny.DownloadInfoDatabase INSTANCE;
 
-    public DownloadInfoDatabase(Context context) {
+    public DownloadDatabase(Context context) {
         super(context, new File(Environment.getExternalStorageDirectory(), "downloadinfos.db").getAbsolutePath(),
                 null,
                 DATABASE_VERSION);
@@ -37,6 +34,19 @@ public class DownloadInfoDatabase extends SQLiteOpenHelper {
             if (!db.inTransaction()) {
                 db.execSQL("VACUUM");
             }
+        }
+    }
+
+    public void deleteDownloadInfo(long id) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            String query = "delete from downloadInfos where _id=?";
+            db.execSQL(query, new String[]{Long.toString(id)});
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+
         }
     }
 
@@ -148,19 +158,6 @@ public class DownloadInfoDatabase extends SQLiteOpenHelper {
         }
     }
 
-    public void deleteDownloadInfo(long id) {
-        SQLiteDatabase db = getWritableDatabase();
-        db.beginTransaction();
-        try {
-            String query = "delete from downloadInfos where _id=?";
-            db.execSQL(query, new String[]{Long.toString(id)});
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-
-        }
-    }
-
     public long insertTask(DownloadInfo downloadInfo) {
         final SQLiteDatabase db = getWritableDatabase();
         // String sql = "INSERT OR IGNORE INTO `downloadInfos`(`currentBytes`,`fileName`,`finished`,`_id`,`message`,`status`,`totalBytes`,`url`) VALUES (?,?,?,nullif(?, 0),?,?,?,?)";
@@ -206,11 +203,11 @@ public class DownloadInfoDatabase extends SQLiteOpenHelper {
         }
     }
 
-    public static DownloadInfoDatabase getInstance(Context context) {
+    public static euphoria.psycho.funny.DownloadInfoDatabase getInstance(Context context) {
         if (INSTANCE == null) {
-            synchronized (DownloadInfoDatabase.class) {
+            synchronized (euphoria.psycho.funny.DownloadInfoDatabase.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new DownloadInfoDatabase(context);
+                    INSTANCE = new euphoria.psycho.funny.DownloadInfoDatabase(context);
                 }
             }
         }
@@ -230,3 +227,4 @@ public class DownloadInfoDatabase extends SQLiteOpenHelper {
     }
 
 }
+

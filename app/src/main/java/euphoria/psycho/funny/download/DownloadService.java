@@ -1,4 +1,4 @@
-package euphoria.psycho.funny.downloader;
+package euphoria.psycho.funny.download;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -9,17 +9,20 @@ import android.text.format.Formatter;
 
 import com.liulishuo.filedownloader.model.FileDownloadStatus;
 
-import java.text.Format;
 import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-public class DownloaderService extends Service implements DownloaderManager.DownloaderStatusUpdater {
+public class DownloadService extends Service implements DownloadManager.DownloadStatusUpdater {
     public static final String CHANNEL_ID = "download";
     private static final int ID_NOTIFICATION = 2;
 
-    private void startNotification(String fileName, int progress, String fileSize, int speed) {
+    private boolean shouldStop() {
+        return DownloadDatabase.getInstance(this).getPendingTasks().size() == 0;
+    }
+
+    private void startNotification(String fileName, int progress, String fileSize, long speed) {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
         builder.setContentTitle("正在下载");
@@ -34,31 +37,31 @@ public class DownloaderService extends Service implements DownloaderManager.Down
         startForeground(ID_NOTIFICATION, notification);
     }
 
-    private void updateNotification(DownloaderTask task, int soFarBytes, int totalBytes) {
-        int progress = (int) (((float) soFarBytes / totalBytes) * 100);
-        String fileSize = Formatter.formatFileSize(DownloaderService.this, soFarBytes) + "/" +
-                Formatter.formatFileSize(DownloaderService.this, totalBytes);
-        DownloaderItem downloaderItem = DataManager.instance().findItemById(task.getId());
-        if (downloaderItem != null) {
-            if (task.getStatus() == FileDownloadStatus.completed) {
-                List<DownloaderItem> items = DataManager.instance().findItemByStatus(FileDownloadStatus.progress);
-                if (items.size() == 0) {
+    private void updateNotification(DownloadInfo task, long currentBytes, long totalBytes) {
+        int progress = (int) (((float) currentBytes / totalBytes) * 100);
+        String fileSize = Formatter.formatFileSize(DownloadService.this, currentBytes) + "/" +
+                Formatter.formatFileSize(DownloadService.this, totalBytes);
+
+        if (task != null) {
+            if (task.finished) {
+                List<DownloadInfo> downloaderItemList = DownloadDatabase.getInstance(this).getPendingTasks();
+                if (shouldStop()) {
                     stopForeground(true);
                 } else {
-                    startNotification(downloaderItem.getTitle(), progress, fileSize, task.getSpeed());
+                    startNotification(task.fileName, progress, fileSize, task.speed);
                 }
             }
         } else {
-            List<DownloaderItem> downloaderItemList = DataManager.instance().loadDownloadingData();
-            if (downloaderItemList.size() == 0) {
+
+            if (shouldStop()) {
                 stopForeground(true);
             }
         }
     }
 
     @Override
-    public void complete(DownloaderTask task) {
-        updateNotification(task, task.getSmallFileSoFarBytes(), task.getSmallFileTotalBytes());
+    public void complete(DownloadInfo task) {
+        updateNotification(task, task.currentBytes, task.totalBytes);
     }
 
     @Nullable
@@ -70,12 +73,12 @@ public class DownloaderService extends Service implements DownloaderManager.Down
     @Override
     public void onCreate() {
         super.onCreate();
-        DownloaderManager.instance().addUpdater(this);
+        DownloadManager.instance().addUpdater(this);
     }
 
     @Override
     public void onDestroy() {
-        DownloaderManager.instance().removeUpdater(this);
+        DownloadManager.instance().removeUpdater(this);
         stopForeground(true);
         super.onDestroy();
 
@@ -88,7 +91,7 @@ public class DownloaderService extends Service implements DownloaderManager.Down
 
 
     @Override
-    public void update(DownloaderTask task) {
-        updateNotification(task, task.getSmallFileSoFarBytes(), task.getSmallFileTotalBytes());
+    public void update(DownloadInfo task) {
+        updateNotification(task, task.currentBytes, task.totalBytes);
     }
 }

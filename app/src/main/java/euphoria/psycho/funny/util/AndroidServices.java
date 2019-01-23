@@ -403,16 +403,6 @@ public class AndroidServices {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
-    public void requestOverlayPermission() {
-        if (mContext.checkSelfPermission(Manifest.permission.SYSTEM_ALERT_WINDOW) == PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mContext.startActivity(intent);
-    }
-
     @TargetApi(Build.VERSION_CODES.P)
     public WifiRttManager provideWifiRttManager() {
 
@@ -426,6 +416,16 @@ public class AndroidServices {
         } else {
             return (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public void requestOverlayPermission() {
+        if (mContext.checkSelfPermission(Manifest.permission.SYSTEM_ALERT_WINDOW) == PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(intent);
     }
 
     public static AndroidServices instance() {

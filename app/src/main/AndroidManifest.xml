@@ -77,7 +77,7 @@
             android:launchMode="singleInstance" >
 
         </activity>
-        <activity android:name=".downloader.DownloadActivity" >
+        <activity android:name=".download.DownloadActivity" >
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
                 <action android:name="android.intent.action.MAIN" />
@@ -89,6 +89,6 @@
 
         </service>
         <service android:name=".service.HiddenCameraService" />
-        <service android:name=".downloader.DownloaderService" />
+        <service android:name=".download.DownloadService" />
     </application>
 </manifest>

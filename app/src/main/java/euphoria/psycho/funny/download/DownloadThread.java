@@ -1,4 +1,4 @@
-package euphoria.psycho.funny;
+package euphoria.psycho.funny.download;
 
 import android.content.Context;
 import android.os.SystemClock;
@@ -16,7 +16,8 @@ import java.security.NoSuchAlgorithmException;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 
-import euphoria.psycho.funny.model.DownloadInfo;
+import euphoria.psycho.funny.DownloadInfoDatabase;
+import euphoria.psycho.funny.RequestException;
 import euphoria.psycho.funny.util.AndroidContext;
 import euphoria.psycho.funny.util.FileUtils;
 

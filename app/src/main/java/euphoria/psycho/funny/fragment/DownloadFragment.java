@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import euphoria.psycho.funny.DownloadInfoDatabase;
 import euphoria.psycho.funny.R;
 import euphoria.psycho.funny.adapter.DownloadAdapter;
-import euphoria.psycho.funny.model.DownloadInfo;
+import euphoria.psycho.funny.download.DownloadInfo;
 import euphoria.psycho.funny.service.DownloadService;
 
 public class DownloadFragment extends Fragment implements DownloadAdapter.MenuListener {

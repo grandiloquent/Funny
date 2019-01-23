@@ -27,9 +27,9 @@ import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
 import euphoria.psycho.funny.DownloadInfoDatabase;
-import euphoria.psycho.funny.DownloadThread;
+import euphoria.psycho.funny.download.DownloadThread;
 import euphoria.psycho.funny.fragment.DownloadFragment;
-import euphoria.psycho.funny.model.DownloadInfo;
+import euphoria.psycho.funny.download.DownloadInfo;
 import euphoria.psycho.funny.util.BaseService;
 import euphoria.psycho.funny.util.FileUtils;
 import euphoria.psycho.funny.util.HttpUtils;

@@ -4,6 +4,8 @@ import android.app.Application;
 import android.os.Environment;
 import android.os.StrictMode;
 
+import com.liulishuo.filedownloader.FileDownloader;
+
 import java.io.File;
 
 import euphoria.psycho.funny.util.debug.Log;
@@ -20,6 +22,8 @@ public class App extends Application {
         AndroidContext.initialize(getApplicationContext());
         File logDirectory = new File(Environment.getExternalStorageDirectory(), LOG_DIRECTOR_NAME);
         FileUtils.createDirectory(logDirectory);
+
+        FileDownloader.setup(this);
         Log.setDir(logDirectory);
     }
 }

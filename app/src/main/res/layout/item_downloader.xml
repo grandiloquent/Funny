@@ -33,13 +33,13 @@
                 android:src="@drawable/start_download" />
         </FrameLayout>
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_91porn_item_title"
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:layout_toRightOf="@+id/fl_img"
             android:paddingLeft="5dp"
-            android:textColor="@color/item_v9pron_title_text_color"
+            android:textColor="#333"
             android:textStyle="bold"
             app:autoSizeMaxTextSize="16sp"
             app:autoSizeMinTextSize="12sp"
