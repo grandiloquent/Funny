@@ -40,6 +40,11 @@ public class MainActivity extends BaseAppCompatActivity {
         mDrawer.openDrawer(GravityCompat.START);
     }
 
+    private boolean isFragment() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FileFragment.class.getCanonicalName());
+        return fragment != null && fragment.isVisible();
+    }
+
     private boolean selectDrawerItem(MenuItem menuItem) {
         Menu menu = mNavigation.getMenu();
 
@@ -186,11 +191,6 @@ public class MainActivity extends BaseAppCompatActivity {
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    private boolean isFragment() {
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FileFragment.class.getCanonicalName());
-        return fragment != null && fragment.isVisible();
     }
 
     @Override

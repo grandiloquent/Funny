@@ -4,9 +4,12 @@
 #include <android/log.h>
 #include <stdlib.h>
 #include <jni.h>
+#include <limits.h>
 
 #define LOGI(...) \
   ((void)__android_log_print(ANDROID_LOG_INFO, "hello-libs::", __VA_ARGS__))
+#define LOGE(...) \
+  ((void)__android_log_print(ANDROID_LOG_ERROR, "hello-libs::", __VA_ARGS__))
 
 int codeConvert(char *from_charset, char *to_charset, char *inbuf, size_t inlen, char *outbuf,
                 size_t outlen) {
@@ -27,7 +30,7 @@ int u2g(char *inbuf, size_t inlen, char *outbuf, size_t outlen) {
 }
 
 int g2u(char *inbuf, size_t inlen, char *outbuf, size_t outlen) {
-    return codeConvert("gb2312", "utf-8", inbuf, inlen, outbuf, outlen);
+    return codeConvert("gbk", "utf-8", inbuf, inlen, outbuf, outlen);
 }
 
 void renameMp3File(const char *path) {
@@ -56,8 +59,9 @@ void renameMp3File(const char *path) {
 
     char dir[PATH_MAX];
     strcpy(dir, path);
-    substringBeforeLast(dir, '/', strlen(path));
 
+    substringBeforeLast(dir, '/', strlen(path));
+    //LOGE("%s", dir);
     char t[256] = {0};
     strcat(t, dir);
     strcat(t, "/");
@@ -73,7 +77,7 @@ void renameMp3File(const char *path) {
     free(wt);
     free(uwa);
     free(uwt);
-    free(dir);
+
     fclose(file);
 }
 
@@ -85,4 +89,13 @@ Java_euphoria_psycho_funny_natives_NativeUtils_renameMp3File(JNIEnv *env, jclass
     renameMp3File(fileName);
 
     (*env)->ReleaseStringUTFChars(env, fileName_, fileName);
+}
+
+JNIEXPORT void JNICALL
+Java_euphoria_psycho_funny_natives_NativeUtils_startServer(JNIEnv *env, jclass type, jstring ip_,
+                                                           jint port, jobjectArray directories) {
+    const char *ip = (*env)->GetStringUTFChars(env, ip_, 0);
+
+
+    (*env)->ReleaseStringUTFChars(env, ip_, ip);
 }

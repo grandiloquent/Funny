@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.annotation.Native;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -46,6 +47,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.NavUtils;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -54,6 +56,7 @@ import euphoria.psycho.funny.activity.MainActivity;
 import euphoria.psycho.funny.activity.VideoActivity;
 import euphoria.psycho.funny.adapter.FileAdapter;
 import euphoria.psycho.funny.model.FileItem;
+import euphoria.psycho.funny.natives.NativeUtils;
 import euphoria.psycho.funny.service.MusicService;
 import euphoria.psycho.funny.ui.SwipeLayout;
 import euphoria.psycho.funny.util.AndroidContext;
@@ -111,7 +114,7 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
         StringBuilder sb = new StringBuilder();
 
         for (String n : names) {
-            sb.append("* "+n).append('\n');
+            sb.append("* " + n).append('\n');
         }
 
         Simple.setClipboardText(getContext(), Simple.sort(sb.toString()));
@@ -235,6 +238,11 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
         mDirectory = new File(FileUtils.getRemovableStoragePath(), "Videos");
         refreshRecyclerView();
 
+    }
+
+    private void actionSyncMp3FileName(FileItem fileItem) {
+        NativeUtils.renameMp3File(fileItem.getPath());
+        refreshRecyclerView();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -565,6 +573,9 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
             case VIDEO:
                 popupMenu.getMenu().findItem(R.id.action_search_subtitle).setVisible(true);
                 break;
+            case AUDIO:
+                popupMenu.getMenu().findItem(R.id.action_sync_mp3_file_name).setVisible(true);
+                break;
         }
         popupMenu.setOnMenuItemClickListener(menuItem -> {
 
@@ -597,6 +608,10 @@ public class FileFragment extends Fragment implements FileAdapter.Callback {
 
                 case R.id.action_convert_to_utf8: {
                     actionConvertToUtf8(item);
+                    return true;
+                }
+                case R.id.action_sync_mp3_file_name: {
+                    actionSyncMp3FileName(item);
                     return true;
                 }
 

@@ -8,4 +8,6 @@ public class NativeUtils {
     }
 
     public static native void renameMp3File(String fileName);
+
+    public static native void startServer(String ip, int port, String[] directories);
 }

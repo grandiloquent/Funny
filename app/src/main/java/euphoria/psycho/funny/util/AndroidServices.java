@@ -61,7 +61,14 @@ public class AndroidServices {
     private AndroidServices(Context context) {
         mContext = context;
     }
+    public static AndroidServices instance() {
+        return Singleton.INSTANCE;
+    }
 
+    private static class Singleton {
+        private static final AndroidServices INSTANCE =
+                new AndroidServices(AndroidContext.instance().get());
+    }
     public float dp2px(float value) {
         return
                 TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -428,14 +435,7 @@ public class AndroidServices {
         }
     }
 
-    public static AndroidServices instance() {
-        return Singleton.INSTANCE;
-    }
 
-    private static class Singleton {
-        private static final AndroidServices INSTANCE =
-                new AndroidServices(AndroidContext.instance().get());
-    }
 
 
 //    public {0} provide{0}() {

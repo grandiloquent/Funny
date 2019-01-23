@@ -20,4 +20,8 @@
         android:id="@+id/action_convert_to_utf8"
         android:title="@string/menu_convert_to_utf8"
         android:visible="false" />
+    <item
+        android:id="@+id/action_sync_mp3_file_name"
+        android:title="同步文件名"
+        android:visible="false" />
 </menu>
