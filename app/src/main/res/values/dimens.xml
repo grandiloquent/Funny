@@ -7,4 +7,5 @@
     <dimen name="notification_big_icon_width">64.0dip</dimen>
     <dimen name="notification_info_container_padding_bottom">4.0dip</dimen>
     <dimen name="notification_info_container_padding_left">8.0dip</dimen>
+
 </resources>

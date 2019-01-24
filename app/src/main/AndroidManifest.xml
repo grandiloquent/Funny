@@ -16,7 +16,10 @@
         android:theme="@style/AppTheme"
         android:windowSoftInputMode="adjustPan">
         <activity android:name=".activity.MainActivity">
-
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
         </activity>
         <activity android:name=".hidden.HiddenCameraActivity">
 
@@ -78,10 +81,10 @@
 
         </activity>
         <activity android:name=".download.DownloadActivity" >
-            <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER" />
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
+            <!--<intent-filter>-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+            <!--</intent-filter>-->
         </activity>
 
         <service android:name=".service.MusicService" />

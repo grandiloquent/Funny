@@ -20,7 +20,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import euphoria.psycho.funny.R;
-import euphoria.psycho.funny.fragment.DownloadFragment;
 import euphoria.psycho.funny.fragment.FileFragment;
 import euphoria.psycho.funny.fragment.TranslateFragment;
 import euphoria.psycho.funny.util.AndroidServices;
@@ -56,14 +55,7 @@ public class MainActivity extends BaseAppCompatActivity {
                 menu.findItem(R.id.action_translate).setChecked(false);
                 break;
             }
-            case R.id.action_download: {
-                fragmentClass = DownloadFragment.class;
-
-                menuItem.setChecked(true);
-                menu.findItem(R.id.action_translate).setChecked(false);
-                menu.findItem(R.id.action_fragment_file).setChecked(false);
-                break;
-            }
+          
             case R.id.action_translate: {
                 fragmentClass = TranslateFragment.class;
                 menuItem.setChecked(true);

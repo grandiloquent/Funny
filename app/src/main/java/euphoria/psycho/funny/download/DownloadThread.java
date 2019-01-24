@@ -20,6 +20,7 @@ import euphoria.psycho.funny.DownloadInfoDatabase;
 import euphoria.psycho.funny.RequestException;
 import euphoria.psycho.funny.util.AndroidContext;
 import euphoria.psycho.funny.util.FileUtils;
+import euphoria.psycho.funny.util.debug.Log;
 
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.net.HttpURLConnection.HTTP_GONE;
@@ -46,6 +47,7 @@ public class DownloadThread extends Thread {
     private static final int STATUS_HTTP_DATA_ERROR = 2;
     private static final int STATUS_TIMEOUT = 3;
     private static final int STATUS_UNCERTAIN = 4;
+    private static final String TAG = "TAG/" + DownloadThread.class.getSimpleName();
     private final Context mContext;
     private final DownloadInfo mInfo;
     private final long mTaskId;
@@ -55,13 +57,14 @@ public class DownloadThread extends Thread {
     private long mSpeed;
     private long mSpeedSampleBytes = 0L;
     private long mSpeedSampleStart = 0L;
+    private DownloadManager.DownloadStatusUpdater mStatusUpdater;
     private int mTimeout = 20 * 1000;
 
-
-    public DownloadThread(DownloadInfo info, Context context) {
+    public DownloadThread(DownloadInfo info, Context context, DownloadManager.DownloadStatusUpdater updater) {
         mInfo = info;
         mTaskId = info.id;
         mContext = context;
+        mStatusUpdater = updater;
     }
 
     private void addRequestHeaders(HttpsURLConnection c) {
@@ -191,14 +194,16 @@ public class DownloadThread extends Thread {
         try {
             appContext = SSLContext.getDefault();
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            android.util.Log.e(TAG, "executeDownload: ", e);
         }
         // https://developer.android.com/reference/java/net/HttpURLConnection.html
 
 
         int tries = 0;
         while (tries++ < DEFAULT_RETRIES) {
-            mInfo.listener.onStatusChanged(mTaskId, "第 " + tries + " 尝试下载 " + FileUtils.getFileName(mInfo.fileName));
+            mStatusUpdater.update(mInfo);
+
+            //mInfo.listener.onStatusChanged(mTaskId, "第 " + tries + " 尝试下载 " + FileUtils.getFileName(mInfo.fileName));
             HttpsURLConnection c = null;
 
             try {
@@ -220,7 +225,9 @@ public class DownloadThread extends Thread {
                     ((HttpsURLConnection) c).setSSLSocketFactory(appContext.getSocketFactory());
                 }
                 int rc = c.getResponseCode();
-
+                if (DEBUG) {
+                    Log.d(TAG, "executeDownload: tries = " + tries + ",response code = " + rc);
+                }
                 switch (rc) {
                     case HTTP_OK:
                     case HTTP_PARTIAL: {
@@ -228,21 +235,34 @@ public class DownloadThread extends Thread {
                         transferData(c);
                         mInfo.finished = true;
                         writeToDatabase();
-                        mInfo.listener.onFinished(mInfo.id);
+                        //mInfo.listener.onFinished(mInfo.id);
                         return;
                     }
                     case HTTP_FORBIDDEN: {
+
+                        if (DEBUG) {
+                            Log.d(TAG, "executeDownload: " + HTTP_FORBIDDEN);
+                        }
                         SystemClock.sleep(DEFAULT_DELAY_TIME);
                         continue;
                     }
                     case HTTP_GONE: {
+                        if (DEBUG) {
+                            Log.d(TAG, "executeDownload: " + HTTP_GONE);
+                        }
                         throw new RequestException(STATUS_FATAL, "The server rejected the current request");
                     }
                     case HTTP_REQUESTED_RANGE_NOT_SATISFIABLE: {
+                        if (DEBUG) {
+                            Log.d(TAG, "executeDownload: " + HTTP_REQUESTED_RANGE_NOT_SATISFIABLE);
+                        }
                         throw new RequestException(STATUS_FATAL, "Range Not Satisfiable. It is possible that the file has been downloaded but the task is not marked as completed.");
                     }
                     default: {
-                        mInfo.listener.onStatusChanged(mTaskId, "发生未捕获错误。 状态码: " + rc);
+                        if (DEBUG) {
+                            Log.d(TAG, "executeDownload: " + rc);
+                        }
+                        //mInfo.listener.onStatusChanged(mTaskId, "发生未捕获错误。 状态码: " + rc);
                         throw new RequestException(STATUS_HTTP_DATA_ERROR, "ResponseCode: " + rc);
                     }
 
@@ -252,11 +272,16 @@ public class DownloadThread extends Thread {
                     throw e;
                 }
             } catch (SocketTimeoutException e) {
+                if (DEBUG) {
+                    Log.d(TAG, "executeDownload: " + e.getMessage());
+                }
                 SystemClock.sleep(DEFAULT_DELAY_TIME);
 
             } catch (IOException e) {
                 SystemClock.sleep(DEFAULT_DELAY_TIME);
-
+                if (DEBUG) {
+                    Log.d(TAG, "executeDownload: " + e.getMessage());
+                }
             } finally {
                 if (c != null) c.disconnect();
             }
@@ -290,6 +315,9 @@ public class DownloadThread extends Thread {
                 mInfo.totalBytes = -1L;
             }
         }
+        if (DEBUG) {
+            Log.d(TAG, "parseOkHeaders: " + mInfo);
+        }
 
     }
 
@@ -304,6 +332,9 @@ public class DownloadThread extends Thread {
             try {
                 in = c.getInputStream();
             } catch (IOException e) {
+                if (DEBUG) {
+                    Log.d(TAG, "transferData: " + e.getMessage());
+                }
                 throw new RequestException(STATUS_HTTP_DATA_ERROR, e);
             }
 
@@ -312,7 +343,8 @@ public class DownloadThread extends Thread {
                 if (mInfo.currentBytes > 0)
                     out.seek(mInfo.currentBytes);
             } catch (IOException e) {
-                throw new RequestException(STATUS_FILE_ERROR, e);
+                Log.e(TAG, e.getMessage());
+                throw new RequestException(STATUS_FATAL, e);
             }
             byte[] buffer = new byte[DEFAULT_BUFFER_SIZE >> 1];
 
@@ -335,11 +367,17 @@ public class DownloadThread extends Thread {
                     mInfo.currentBytes += len;
                     updateProgress();
                 } catch (IOException e) {
+                    if (DEBUG) {
+                        Log.d(TAG, "transferData: " + e.getMessage());
+                    }
                     throw new RequestException(STATUS_UNCERTAIN, e);
                 }
             }
 
         } catch (Exception e) {
+            if (DEBUG) {
+                Log.d(TAG, "transferData: " + e.getMessage());
+            }
             throw new RequestException(STATUS_HTTP_DATA_ERROR, e);
         } finally {
             if (in != null) FileUtils.closeSilently(in);
@@ -361,7 +399,9 @@ public class DownloadThread extends Thread {
             }
 
             if (mSpeedSampleStart != 0) {
-                mInfo.listener.notifySpeed(mTaskId, mSpeed);
+                mInfo.speed = mSpeed;
+                mStatusUpdater.update(mInfo);
+                //mInfo.listener.notifySpeed(mTaskId, mSpeed);
             }
             mSpeedSampleStart = now;
             mSpeedSampleBytes = currentBytes;
@@ -381,11 +421,14 @@ public class DownloadThread extends Thread {
 
     @Override
     public void run() {
+        if (DEBUG) {
+            Log.d(TAG, "run: " + mInfo);
+        }
         try {
-            mInfo.listener.onStatusChanged(mTaskId, "开始下载: " + FileUtils.getFileName(mInfo.fileName));
+            //mInfo.listener.onStatusChanged(mTaskId, "开始下载: " + FileUtils.getFileName(mInfo.fileName));
+            mStatusUpdater.update(mInfo);
             executeDownload();
         } catch (RequestException e) {
-
 
             int s = e.getFinalStatus();
 
@@ -396,7 +439,7 @@ public class DownloadThread extends Thread {
             mInfo.status = s;
             mInfo.message = e.getMessage();
             writeToDatabase();
-            mInfo.listener.onError(mTaskId, e.getMessage());
+            //mInfo.listener.onError(mTaskId, e.getMessage());
         }
     }
 }

@@ -10,6 +10,23 @@ public class DownloadInfo {
     public long id;
     public Listener listener;
     public String message;
+
+    @Override
+    public String toString() {
+        return "DownloadInfo{" +
+                "currentBytes=" + currentBytes +
+                ", fileName='" + fileName + '\'' +
+                ", finished=" + finished +
+                ", id=" + id +
+                ", listener=" + listener +
+                ", message='" + message + '\'' +
+                ", status=" + status +
+                ", totalBytes=" + totalBytes +
+                ", url='" + url + '\'' +
+                ", speed=" + speed +
+                '}';
+    }
+
     public int status;
     public long totalBytes;
     public String url;

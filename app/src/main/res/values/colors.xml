@@ -6,5 +6,7 @@
     <color name="rippleColorLight">@color/md_black_1000_12</color>
     <color name="md_black_1000_12">#1F000000</color>
     <color name="md_white_1000">#FFFFFFFF</color>
+    <dimen name="divider_height">1dp</dimen>
     <color name="dialogLight">@color/md_white_1000</color>
+    <color name="list_divider">#1f000000</color>
 </resources>
